@@ -100,7 +100,7 @@ viz_gpca_pvalue<-function(gpca){
   }
 }
 
-compare.pca<-function(corrected,raw,batch,tissue,guided=FALSE){
+compare.gpca<-function(corrected,raw,batch,tissue,guided=FALSE){
   if(guided){
     raw.pca<-raw$gpca
     corrected.pca<-corrected$gpca

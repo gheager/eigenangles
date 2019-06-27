@@ -1,4 +1,4 @@
-viz_angles_batch_vs_all<-function(...){
+viz_eigenangles_batch_vs_all<-function(...){
   list(...) %>% map(~.$batch_vs_all) %>% transpose -> angles
   angles.df<-data.frame(
     cosinus=angles %>% unlist %>% cospi,
@@ -14,7 +14,7 @@ viz_angles_batch_vs_all<-function(...){
     facet_wrap(~batch)
 }
 
-viz_angles_inter_batch<-function(...){
+viz_eigenangles_inter_batch<-function(...){
   list(...) %>% map(~.$inter_batch) -> angles
   angles.df<-data.frame(
     cosinus=angles %>% unlist %>% cospi,
@@ -30,47 +30,3 @@ viz_angles_inter_batch<-function(...){
     geom_arc(aes(x0=0,y0=0,r=1,start=0,end=pi/2),colour='black',inherit.aes = FALSE)+coord_fixed()+
     facet_grid(batch2~batch1)
 }
-
-# viz_angles<-function(...,filename){
-#   list(...) %>% transpose -> angles
-#   filename %>% pdf
-#   for(batch in angles){
-#     plot(ggplot()+xlim(c(0,1.25))+ylim(c(0,1))+
-#       aes(
-#         x=batch %>% unlist %>% cospi,
-#         y=batch %>% unlist %>% sinpi,
-#         colour=batch %>% imap(~rep(..2,each=length(..1))) %>% unlist %>% factor
-#       )+
-#       geom_segment(xend=0,yend=0)+
-#       geom_text(label=batch %>% unlist %>% round(3) %>% paste('$\\pi$') %>% TeX,parse=TRUE,nudge_x=.1)+
-#       geom_arc(aes(x0=0,y0=0,r=1,start=0,end=pi/2),colour='black',inherit.aes = FALSE)+coord_fixed()+
-#       labs(colour='correction'))
-#   };dev.off()
-# }
-
-# ang<-get(load('Corn Expression Atlas/angles.Rdata'))
-# ang%<>%transpose
-# angnone<-ang$none
-# angcomb<-ang$comb
-# angruv<-ang$ruv
-# viz_angles(none=angnone,combat=angcomb,ruv=angruv,filename='Corn Expression Atlas/angles viz.pdf')
-# 
-# viz_angles(none=angnone,filename='none corn.pdf')
-# 
-# ang %>% map(function(m) m %>% map(~.[2]) %>% unlist %>% mean)
-
-# viz_angles<-function(...){
-#   list(...) %>% transpose %>% map(
-#     function(a){
-#       ggplot()+xlim(c(0,1.25))+ylim(c(0,1))+
-#         aes(
-#           x=a %>% unlist %>% cospi,
-#           y=a %>% unlist %>% sinpi,
-#           colour=a %>% imap(~rep(..2,each=length(..1))) %>% unlist %>% factor
-#         )+
-#         geom_segment(xend=0,yend=0)+
-#         geom_text(label=a %>% unlist %>% round(3) %>% paste('$\\pi$') %>% TeX,parse=TRUE,nudge_x=.1)+
-#         geom_arc(aes(x0=0,y0=0,r=1,start=0,end=pi/2),colour='black',inherit.aes = FALSE)+coord_fixed()
-#     }
-#   ) %>% arrangeGrob(grobs=.)
-# }

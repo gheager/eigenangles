@@ -1,5 +1,5 @@
 correct.batch.effect<-function(data,batch,
-                               method=c('none','combat','ruv','mnn','bmc'),
+                               method=c('none','combat','ruv','mnn'),
                                model,log=TRUE,model.data,k=1){
   for(u in model.data %>% seq_along){
     eval(parse(text=paste0(
@@ -25,7 +25,7 @@ correct.batch.effect<-function(data,batch,
   }
 }
 
-remove.batch.effect<-function(...,list=NULL,model=NULL,method=c('none','combat','ruv','bmc','mnn'),log=TRUE,k=1){
+remove.batch.effect<-function(...,list=NULL,model=NULL,method=c('none','combat','ruv','mnn'),log=TRUE,k=1){
   if(is.null(list)) experiments<-list(...) else experiments<-list; if(is.null(names(experiments))) names(experiments)<-paste0('batch',experiments %>% seq_along)
   genes<-experiments %>% map(rownames)
   common.genes<-genes %>% purrr::reduce(intersect)

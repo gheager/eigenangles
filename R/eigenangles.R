@@ -61,34 +61,3 @@ eigenangles<-function(data,batch,tissue,scale=FALSE){
     inter_batch=angles_inter_batch
   ))
 }
-
-#parallel version
-# eigenangles<-function(data,batch,tissue){
-#   batch%<>%factor; batch %>% levels -> batches
-#   angles_batch_vs_all<-list()
-#   cl <- detectCores() %>% subtract(1) %>% makeSOCKcluster
-#   cl %>% clusterExport(c('angles','angledet','orth','normalise','inner'))
-#   cl %>% registerDoSNOW
-#   angles_batch_vs_all<-
-#     foreach(b=batches,.packages=c('magrittr','purrr','rlang')) %dopar% {
-#       data.all<-NULL; data.batch<-NULL
-#       for(t in tissue[batch==b] %>% unique){
-#         if(sum(tissue==t)>1){
-#           data.all%<>%cbind(data[,tissue==t] %>% as.matrix %>% rowMeans)
-#         }else{
-#           data.all%<>%cbind(data[,tissue==t])
-#         }
-#         if(sum(tissue[batch==b]==t)>1){
-#           data.batch%<>%cbind(data[,tissue==t & batch==b] %>% as.matrix %>% rowMeans)
-#         }else{
-#           data.batch%<>%cbind(data[,tissue==t & batch==b])
-#         }
-#       }
-#       angles(
-#         data.all %>% t %>% prcomp(scale=scale) %$% rotation,
-#         data.batch %>% t %>% prcomp(scale=scale) %$% rotation
-#       )
-#     }
-#   cl %>% stopCluster
-#   return(angles_batch_vs_all)
-# }
