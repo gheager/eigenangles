@@ -14,7 +14,8 @@ export(
 )
 
 import(purrr)
-import(magrittr)
+@importFrom magrittr %>%
+@importFrom magrittr %<>%
 import(ggplot2)
 import(ggforce)
 import(latex2exp)
