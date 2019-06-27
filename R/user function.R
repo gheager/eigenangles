@@ -42,7 +42,7 @@ remove.batch.effect<-function(...,list=NULL,model=NULL,method=c('none','combat',
   data<-NULL;batch<-NULL;vars<-list()
   for(i in experiments %>% seq_along){
     experiments[[i]]->exp
-    data%<>%cbind(exp %>% assays %$% counts %>% extract(rownames(exp)%in%common.genes,))
+    data%<>%cbind(exp %>% counts %>% extract(rownames(exp)%in%common.genes,))
     batch%<>%c(names(experiments)[[i]] %>% rep(dim(exp)[2]))
     for(v in all.vars(model)) vars[[v]]%<>%c(exp[[v]])
   }; batch%<>%factor
@@ -58,7 +58,7 @@ remove.batch.effect<-function(...,list=NULL,model=NULL,method=c('none','combat',
 
 eigenangles.summaryexperiment<-function(experiment,scale=FALSE){
   eigenangles(
-    experiment %>% assays %$% counts,
+    experiment %>% counts,
     experiment %>% metadata %$% batch,
     experiment$organism_part,
     scale=scale
@@ -66,5 +66,5 @@ eigenangles.summaryexperiment<-function(experiment,scale=FALSE){
 }
 
 gPCA.integrate<-function(experiment,group){
-  experiment %>% assays %$% counts %>% gPCA(experiment[[group]],scaleY=TRUE)
+  experiment %>% counts %>% gPCA(experiment[[group]],scaleY=TRUE)
 }
