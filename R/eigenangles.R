@@ -1,6 +1,3 @@
-library(magrittr)
-library(purrr)
-
 angledet<-function(U,V){
   U%<>%as.matrix; V%<>%as.matrix
   cbind(U,V) %>% qr %>% qr.R -> new.coord

@@ -1,9 +1,3 @@
-library(ggplot2)
-library(magrittr)
-library(parallel)
-library(doSNOW)
-library(gridExtra)
-
 gPCA<-function(data,batch,center=TRUE,scale=FALSE,log=FALSE,scaleY=FALSE,nperm=0){
   if(log) data %<>% subtract(min(.)) %<>% log1p
   X<-data %>% t %>% scale(center,scale) %>% t %>% na.omit %>% t

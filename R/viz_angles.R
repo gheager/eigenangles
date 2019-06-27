@@ -1,8 +1,3 @@
-library(ggplot2)
-library(ggforce)
-library(latex2exp)
-library(purrr)
-
 viz_angles_batch_vs_all<-function(...){
   list(...) %>% map(~.$batch_vs_all) %>% transpose -> angles
   angles.df<-data.frame(
