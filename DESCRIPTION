@@ -1,0 +1,13 @@
+Package: eigenangles
+Type: R package
+Title: Eigengenes Angles for batch effect evaluation
+Version: 0.1.0
+Author: Guillaume Heger, EMBL-EBI Trainee
+Maintainer: Guillaume Heger <guillaume.heger@gmail.com>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Imports: magrittr, purrr, ggplot2, ggforce, latex2exp, gridExtra, SummarizedExperiment
+Suggests: parallel, doSNOW, sva, RUVSeq, batchelor

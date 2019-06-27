@@ -1,0 +1,21 @@
+export(
+  eigenangles,
+  viz_eigenangles_batch_vs_all,
+  viz_eigenangles_inter_batch,
+  gPCA,
+  viz_gpca,
+  viz_gpca_contrib,
+  viz_gpca_pvalue,
+  compare.gpca,
+  correct.batch.effect,
+  remove.batch.effect,
+  eigenangles.summaryexperiment,
+  gPCA.integrate
+)
+
+import(purrr)
+import(magrittr)
+import(ggplot2)
+import(ggforce)
+import(latex2exp)
+import(SummarizedExperiment)
