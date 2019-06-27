@@ -29,8 +29,8 @@ eigenangles<-function(data,batch,tissue,scale=FALSE){
     }
     filter<-rowVars(data.all)!=0 & rowVars(data.batch)!=0
     angles_batch_vs_all[[b]]<-angles(
-      data.all[filter,] %>% t %>% prcomp(scale=scale) %$% rotation,
-      data.batch[filter,] %>% t %>% prcomp(scale=scale) %$% rotation
+      data.all[filter,] %>% t %>% prcomp(scale=scale) %>% use_series(rotation),
+      data.batch[filter,] %>% t %>% prcomp(scale=scale) %>% use_series(rotation)
     )
     b %>% paste('\n') %>% cat
   }
@@ -47,8 +47,8 @@ eigenangles<-function(data,batch,tissue,scale=FALSE){
       if(length(intersect(tissue[batch==batches[i]],tissue[batch==batches[j]]))>ifelse(scale,1,0)){
         filter<-if(scale) rowVars(data.i)!=0 & rowVars(data.j)!=0 else TRUE
         angles_inter_batch[[batches[i]]][[batches[j]]]<-angles(
-          data.i[filter,] %>% t %>% prcomp(scale=scale) %$% rotation,
-          data.j[filter,] %>% t %>% prcomp(scale=scale) %$% rotation
+          data.i[filter,] %>% t %>% prcomp(scale=scale) %>% use_series(rotation),
+          data.j[filter,] %>% t %>% prcomp(scale=scale) %>% use_series(rotation)
         )
         angles_inter_batch[[batches[j]]][[batches[i]]]<-angles_inter_batch[[batches[i]]][[batches[j]]]
       }
