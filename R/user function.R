@@ -47,12 +47,12 @@ remove.batch.effect<-function(...,list=NULL,model=NULL,method=c('none','combat',
   ))
 }
 
-eigenangles.summaryexperiment<-function(experiment,scale=FALSE){
+eigenangles.summaryexperiment<-function(experiment,group,...){
   eigenangles(
-    experiment %>% assays %>% use_series(corrected),
-    experiment %>% metadata %>% use_series(batch),
-    experiment$organism_part,
-    scale=scale
+    data=experiment %>% assays %>% use_series(corrected),
+    batch=experiment %>% metadata %>% use_series(batch),
+    group=experiment[[group]],
+    ...
   )
 }
 
