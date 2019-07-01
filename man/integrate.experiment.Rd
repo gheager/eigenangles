@@ -23,7 +23,7 @@ integrate.experiments(...,list=NULL,model=NULL,
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-A \code{SummarizedExperiment} object whose \code{assays()} field contains a \code{$corrected} element which the corrected expression matrix. NB: depending on the value of \code{log} argument, the elements of the matrix should be considered either as log-counts or as counts.
+A \code{SummarizedExperiment} object whose \code{assays()} field contains a \code{$corrected} element which is the corrected expression matrix. NB: depending on the value of \code{log} argument, the elements of the matrix should be considered either as log-counts or as counts.
 
 Its \code{colData()} field is the merger of all the \code{colData()} of the experiments given as arguments.
 

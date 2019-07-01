@@ -48,7 +48,7 @@ integrate.experiments<-function(...,list=NULL,model=NULL,method=c('none','combat
   ))
 }
 
-eigenangles.summaryexperiment<-function(experiment,group,...){
+eigenangles.experiments<-function(experiment,group,...){
   eigenangles(
     data=experiment %>% assays %>% use_series(corrected),
     batch=experiment %>% metadata %>% use_series(batch),

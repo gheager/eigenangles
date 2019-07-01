@@ -8,8 +8,8 @@ export(
   viz_gpca_pvalue,
   compare.gpca,
   correct.batch.effect,
-  remove.batch.effect,
-  eigenangles.summaryexperiment,
+  integrate.experiments,
+  eigenangles.experiments,
   gPCA.integrate
 )
 
