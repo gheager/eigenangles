@@ -4,8 +4,7 @@
 Visualising Eigengenes Angles between batches and integrated dataset
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
-}
+Plots eigengenes angles between each batch and integrated dataset.}
 \usage{
 viz_eigenangles_batch_vs_all(...)
 }

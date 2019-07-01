@@ -3,8 +3,7 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Eigengenes angles between the batches of an integrated experiment}
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
-}
+Evaluates batch effect correction by using eigengenes angles.}
 \usage{
 eigenangles.experiments(experiment,group,...)
 }

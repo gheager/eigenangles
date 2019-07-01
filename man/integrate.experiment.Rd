@@ -4,8 +4,7 @@
 Experiments integration with batch effect correction
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
-}
+Integrates experiments by correcting batch effect}
 \usage{
 integrate.experiments(...,list=NULL,model=NULL,
                      method=c('none','combat','ruv','mnn'),log=TRUE,k=1)
