@@ -40,7 +40,9 @@ Its \code{metadata()} field contains a \code{$batch} element giving the batches 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+  \code{\link[sva]{ComBat}}
+  \code{\link[RUVSeq]{RUVs}}
+  \code{\link[batchelor]{mnnCorrect}}
 }
 \examples{}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
