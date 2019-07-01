@@ -4,8 +4,7 @@
 Batch effect correction using several methods
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
-}
+Corrects batch effect within an integrated dataset.}
 \usage{
 correct.batch.effect(data, batch, method=c('none','combat','ruv','mnn'), 
                      model, model.data, log=TRUE, k=1)

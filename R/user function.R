@@ -43,7 +43,7 @@ integrate.experiments<-function(...,list=NULL,model=NULL,method=c('none','combat
   data%<>%correct.batch.effect(batch,method,model,log,model.data=model.frame(model,vars),k=k)
   return(SummarizedExperiment(
     assays=list(corrected=data),
-    colData=gtools::smartbind(list=experiments %>% map(colData)) %>% set_rownames(experiments %>% map(colnames) %>% purrr::reduce(c)),
+    colData=gtools::smartbind(list=experiments %>% map(colData)) %>% set_rownames(experiments %>% map(colnames) %>% unlist) %>% cbind(batch),
     metadata=list(batch=batch)
   ))
 }
