@@ -1,6 +1,6 @@
 correct.batch.effect<-function(data,batch,
                                method=c('none','combat','ruv','mnn'),
-                               model,model.data,log=TRUE,k=1){
+                               model=NULL,model.data,log=TRUE,k=1){
   for(u in model.data %>% seq_along){
     eval(parse(text=paste0(
       names(model.data)[u],'<-model.data[[u]]'
@@ -10,14 +10,14 @@ correct.batch.effect<-function(data,batch,
   if(log) data%<>%log1p
   if(method=='none') return(data)
   else if(method=='bmc'){
-    if(missing(model)) return(pamr.batchadjust(list(x=data,batchlabels=batch))$x)
+    if(is.null(model)) return(pamr.batchadjust(list(x=data,batchlabels=batch))$x)
   }
   else if(method=='combat'){
-    if(missing(model)) return(ComBat(data,batch))
+    if(is.null(model)) return(ComBat(data,batch))
     else return(ComBat(data,batch,mod=model.matrix(model,data=model.data)))
   }
   else if(method=='ruv'){
-    if(missing(model)) stop('Biological model is needed to run RUVs')
+    if(is.null(model)) stop('Biological model is needed to run RUVs')
     else return(RUVs(data,cIdx=seq_len(nrow(data)),k=k,
                      scIdx=makeGroups(expand.grid(model.data) %>% apply(1,paste)),isLog=log)$normalizedCounts)
   }
@@ -42,7 +42,7 @@ integrate.experiments<-function(...,list=NULL,model=NULL,method=c('none','combat
   data%<>%extract(filter,)
   data%<>%correct.batch.effect(batch,method,model,log,model.data=model.frame(model,vars),k=k)
   return(SummarizedExperiment(
-    assays=list(corrected=data),
+    assays=if(log) list(corrected_log_counts=data) else list(corrected_counts=data),
     colData=gtools::smartbind(list=experiments %>% map(colData)) %>% set_rownames(experiments %>% map(colnames) %>% unlist) %>% cbind(batch),
     metadata=list(batch=batch)
   ))
