@@ -48,7 +48,7 @@ integrate.experiments<-function(...,list=NULL,model=NULL,method=c('none','combat
   ))
 }
 
-eigenangles.experiments<-function(experiment,group,...){
+do_eigenangles<-function(experiment,group,...){
   eigenangles(
     data=experiment %>% assays %>% use_series(corrected),
     batch=experiment %>% metadata %>% use_series(batch),
@@ -57,6 +57,6 @@ eigenangles.experiments<-function(experiment,group,...){
   )
 }
 
-gPCA.integrate<-function(experiment,group){
+do_gPCA<-function(experiment,group="batch"){
   experiment %>% assays %>% use_series(counts) %>% gPCA(experiment[[group]],scaleY=TRUE)
 }

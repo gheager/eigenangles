@@ -5,12 +5,11 @@ export(
   gPCA,
   viz_gpca,
   viz_gpca_contrib,
-  viz_gpca_pvalue,
   compare.gpca,
   correct.batch.effect,
   integrate.experiments,
-  eigenangles.experiments,
-  gPCA.integrate
+  do_eigenangles,
+  do_gPCA
 )
 
 import(purrr)
