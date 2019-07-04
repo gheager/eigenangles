@@ -22,7 +22,7 @@ print.gpca<-function(object){
   print(object$ranks)
 }
 
-plot.gpca<-function(object, what=c('guided','unguided','ranks','delta'), dims=c(1,2)){
+plot.gpca<-function(object, what=c('guided','unguided','ranks','delta'), dims=c(1,2), rank.max=length(object$upca$sdev)){
   switch(
     what[1],
     guided = ggplot()+aes(x=object$gpca$x[,dims[1]],y=object$gpca$x[,dims[2]],colour=object$batch)+
@@ -36,7 +36,7 @@ plot.gpca<-function(object, what=c('guided','unguided','ranks','delta'), dims=c(
       ylab(paste0('PC',dims[2]))+
       labs(colour='batch'),
     ranks = ggplot()+
-      aes(x=object$upca$sdev %>% seq_along, y=object$upca$sdev^2)+
+      aes(x=rank.max %>% seq_len, y=object$upca$sdev^2)+
       geom_bar(stat="identity", width=1)+
       geom_bar(aes(x=object$ranks, y=object$gpca$sdev^2, fill=object$ranks %>% seq_along %>% factor), stat="identity", width=1, position="dodge")+
       xlab('Rank')+ylab('Variance')+labs(fill="gPC"),
