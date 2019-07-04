@@ -24,32 +24,59 @@ print.gpca<-function(object){
   print(object$ranks)
 }
 
-viz_gpca<-function(object,dims=1:2,guided=TRUE){
-  pca<-if(guided) object$gpca else object$upca
-  ggplot()+aes(x=pca$x[,dims[1]],y=pca$x[,dims[2]],colour=object$batch)+
-    geom_point()+stat_ellipse()+
-    xlab(if(guided) paste0('gPC',dims[1],'~PC',object$ranks[dims[1]]) else paste0('PC',dims[1]))+
-    ylab(if(guided) paste0('gPC',dims[2],'~PC',object$ranks[dims[2]]) else paste0('PC',dims[2]))+
-    labs(colour='batch')
-}
-
-viz_gpca_contrib<-function(object){
-  grid.arrange(
-    ggplot()+
+plot.gpca<-function(object, what=c('guided','unguided','ranks','delta'), dims=c(1,2)){
+  switch(
+    what[1],
+    guided = ggplot()+aes(x=object$gpca$x[,dims[1]],y=object$gpca$x[,dims[2]],colour=object$batch)+
+      geom_point()+stat_ellipse()+
+      xlab(paste0('gPC',dims[1],'~PC',object$ranks[dims[1]]))+
+      ylab(paste0('gPC',dims[2],'~PC',object$ranks[dims[2]]))+
+      labs(colour='batch'),
+    unguided = ggplot()+aes(x=object$upca$x[,dims[1]],y=object$upca$x[,dims[2]],colour=object$batch)+
+      geom_point()+stat_ellipse()+
+      xlab(paste0('PC',dims[1]))+
+      ylab(paste0('PC',dims[2]))+
+      labs(colour='batch'),
+    ranks = ggplot()+
       aes(x=object$upca$sdev %>% seq_along, y=object$upca$sdev^2)+
       geom_bar(stat="identity", width=1)+
       geom_bar(aes(x=object$ranks, y=object$gpca$sdev^2, fill=object$ranks %>% seq_along %>% factor), stat="identity", width=1, position="dodge")+
       xlab('Rank')+ylab('Variance')+labs(fill="gPC"),
-    ggplot()+
+    delta = ggplot()+
       aes(x=object$gpca$sdev %>% seq_along, y=(object$upca$sdev[object$gpca$sdev %>% seq_along]^2) %>% cumsum)+
       geom_bar(stat="identity",width=1)+
       geom_bar(aes(y=(object$gpca$sdev^2) %>% cumsum, fill=object$gpca$sdev %>% seq_along %>% factor), stat="identity", width=1)+
       geom_text(aes(label=object$delta %>% round(2), y=(object$gpca$sdev^2) %>% cumsum/2))+
-      xlab('Rank')+ylab('Cumulative variance')+labs(fill="gPC"),
-    ncol=2
+      xlab('Rank')+ylab('Cumulative variance')+labs(fill="gPC")
   )
 }
 
+# viz_gpca<-function(object,dims=1:2,guided=TRUE){
+#   pca<-if(guided) object$gpca else object$upca
+#   ggplot()+aes(x=pca$x[,dims[1]],y=pca$x[,dims[2]],colour=object$batch)+
+#     geom_point()+stat_ellipse()+
+#     xlab(if(guided) paste0('gPC',dims[1],'~PC',object$ranks[dims[1]]) else paste0('PC',dims[1]))+
+#     ylab(if(guided) paste0('gPC',dims[2],'~PC',object$ranks[dims[2]]) else paste0('PC',dims[2]))+
+#     labs(colour='batch')
+# }
+# 
+# viz_gpca_contrib<-function(object){
+#   grid.arrange(
+#     ggplot()+
+#       aes(x=object$upca$sdev %>% seq_along, y=object$upca$sdev^2)+
+#       geom_bar(stat="identity", width=1)+
+#       geom_bar(aes(x=object$ranks, y=object$gpca$sdev^2, fill=object$ranks %>% seq_along %>% factor), stat="identity", width=1, position="dodge")+
+#       xlab('Rank')+ylab('Variance')+labs(fill="gPC"),
+#     ggplot()+
+#       aes(x=object$gpca$sdev %>% seq_along, y=(object$upca$sdev[object$gpca$sdev %>% seq_along]^2) %>% cumsum)+
+#       geom_bar(stat="identity",width=1)+
+#       geom_bar(aes(y=(object$gpca$sdev^2) %>% cumsum, fill=object$gpca$sdev %>% seq_along %>% factor), stat="identity", width=1)+
+#       geom_text(aes(label=object$delta %>% round(2), y=(object$gpca$sdev^2) %>% cumsum/2))+
+#       xlab('Rank')+ylab('Cumulative variance')+labs(fill="gPC"),
+#     ncol=2
+#   )
+# }
+# 
 # gPCA<-function(data,batch,center=TRUE,scale=FALSE,log=FALSE,scaleY=FALSE,nperm=0){
 #   if(log) data %<>% subtract(min(.)) %<>% log1p
 #   X<-data %>% t %>% scale(center,scale) %>% t %>% na.omit %>% t

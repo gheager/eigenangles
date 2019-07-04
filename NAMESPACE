@@ -1,10 +1,6 @@
 export(
   eigenangles,
-  viz_eigenangles_batch_vs_all,
-  viz_eigenangles_inter_batch,
   gPCA,
-  viz_gpca,
-  viz_gpca_contrib,
   compare.gpca,
   correct.batch.effect,
   integrate.experiments,

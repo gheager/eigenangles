@@ -55,7 +55,45 @@ eigenangles<-function(data,batch,group,scale=FALSE,center=TRUE,average=TRUE,verb
   }
   for(b in batches) angles_inter_batch[[b]][[b]]<-0
   return(list(
-    batch_vs_all=angles_batch_vs_all,
-    inter_batch=angles_inter_batch
-  ))
+    batch_vs_all=angles_batch_vs_all %>% structure(class='eigenangles.batch_vs_all'),
+    inter_batch=angles_inter_batch %>% structure(class='eigenangles.inter_batch')
+  ) %>% structure(class='eigenangles'))
+}
+
+plot.eigenangles.batch_vs_all<-function(...,angles=NULL){
+  if(is.null(angles)) list(...) %>% transpose -> angles
+  angles.df<-data.frame(
+    cosinus=angles %>% unlist %>% cospi,
+    sinus=angles %>% unlist %>% sinpi,
+    method=angles %>% map(imap %>% partial(...=,~rep(..2,each=length(..1)))) %>% unlist %>% factor,
+    batch=angles %>% imap(~rep(..2,each=length(unlist(..1)))) %>% unlist
+  )
+  ggplot(angles.df,aes(x=cosinus,y=sinus,colour=method))+
+    xlim(c(0,1.25))+ylim(c(0,1))+
+    geom_segment(xend=0,yend=0)+
+    geom_text(label=angles %>% unlist %>% round(3) %>% paste('$\\pi$') %>% TeX,parse=TRUE,nudge_x=.1)+
+    geom_arc(aes(x0=0,y0=0,r=1,start=0,end=pi/2),colour='black',inherit.aes = FALSE)+coord_fixed()+
+    facet_wrap(~batch)
+}
+
+plot.eigenangles.inter_batch<-function(...,angles=NULL){
+  if(is.null(angles)) list(...) -> angles
+  angles.df<-data.frame(
+    cosinus=angles %>% unlist %>% cospi,
+    sinus=angles %>% unlist %>% sinpi,
+    method=angles %>% imap(~rep(.y,each=length(unlist(.x)))) %>% unlist %>% factor,
+    batch1=angles %>% map(imap %>% partial(...=,~rep(.y,each=length(unlist(.x))))) %>% unlist,
+    batch2=angles %>% map(map %>% partial(...=,imap %>% partial(...=,~rep(.y,each=length(.x))))) %>% unlist
+  )
+  ggplot(angles.df,aes(x=cosinus,y=sinus,colour=method))+
+    xlim(c(0,1.25))+ylim(c(0,1))+
+    geom_segment(xend=0,yend=0)+
+    geom_text(label=angles %>% unlist %>% round(3) %>% paste('$\\pi$') %>% TeX,parse=TRUE,nudge_x=.1)+
+    geom_arc(aes(x0=0,y0=0,r=1,start=0,end=pi/2),colour='black',inherit.aes = FALSE)+coord_fixed()+
+    facet_grid(batch2~batch1)
+}
+
+plot.eigenangles<-function(...){
+  plot(plot.eigenangles.batch_vs_all(angles=list(...) %>% map(~.$batch_vs_all) %>% transpose))
+  plot(plot.eigenangles.inter_batch(angles=list(...) %>% map(~.$inter_batch)))
 }
