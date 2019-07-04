@@ -5,7 +5,11 @@ export(
   correct.batch.effect,
   integrate.experiments,
   do_eigenangles,
-  do_gPCA
+  do_gPCA,
+  plot.gpca,
+  plot.eigenangles,
+  plot.eigenangles.batch_vs_all,
+  plot.eigenangles.inter_batch
 )
 
 import(purrr)
