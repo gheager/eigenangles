@@ -35,8 +35,8 @@ plot.gpca<-function(object, what=c('guided','unguided','ranks','delta'), dims=c(
       xlab(paste0('PC',dims[1]))+
       ylab(paste0('PC',dims[2]))+
       labs(colour='batch'),
-    ranks = ggplot()+
-      aes(x=rank.max %>% seq_len, y=object$upca$sdev^2)+
+    ranks = ggplot()+xlim(c(0,rank.max))+
+      aes(x=object$upca$sdev %>% seq_along, y=object$upca$sdev^2)+
       geom_bar(stat="identity", width=1)+
       geom_bar(aes(x=object$ranks, y=object$gpca$sdev^2, fill=object$ranks %>% seq_along %>% factor), stat="identity", width=1, position="dodge")+
       xlab('Rank')+ylab('Variance')+labs(fill="gPC"),
