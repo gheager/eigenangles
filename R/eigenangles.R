@@ -35,6 +35,7 @@ eigenangles<-function(data,batch,group,scale=FALSE,center=TRUE,average=TRUE,verb
   }
   ##########################
   angles_inter_batch<-list()
+  for(b in batches) angles_inter_batch[[b]]<-list()
   for(i in 1:(nlevels(batch)-1)){
     for(j in (i+1):nlevels(batch)){
       data.i<-NULL; data.j<-NULL
