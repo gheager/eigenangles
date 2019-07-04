@@ -57,6 +57,6 @@ do_eigenangles<-function(experiment,group,...){
   )
 }
 
-do_gPCA<-function(experiment,group="batch"){
-  experiment %>% assays %>% use_series(counts) %>% gPCA(experiment[[group]],scaleY=TRUE)
+do_gPCA<-function(experiment,...){
+  experiment %>% assays %>% use_series(corrected) %>% gPCA(batch=experiment$batch,...)
 }
