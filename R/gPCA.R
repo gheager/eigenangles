@@ -4,10 +4,8 @@ gPCA<-function(data,batch,scaleY=TRUE){
   if(scaleY) Y %<>% t %<>% divide_by(colSums(t(.))) %<>% t
   data %>% t %>% prcomp -> upca
   data %>% multiply_by_matrix(Y) %>% t %>% prcomp -> gpca
-  if(projected){
-    gpca %>% predict(t(data)) -> gpca$x
-    gpca$x %>% colSds -> gpca$sdev
-  }
+  gpca %>% predict(t(data)) -> gpca$x
+  gpca$x %>% colSds -> gpca$sdev
   delta<-cumsum(gpca$sdev^2)/cumsum(upca$sdev[seq_along(gpca$sdev)]^2)
   ranks<-(gpca$sdev^2) %>% map(~sum(.<(upca$sdev^2))) %>% unlist
   return(list(
