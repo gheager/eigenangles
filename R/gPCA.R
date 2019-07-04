@@ -1,9 +1,9 @@
-gPCA<-function(data,batch,projected=TRUE,scaleY=TRUE,nperm=0,...){
+gPCA<-function(data,batch,scaleY=TRUE){
   batch %<>% factor
   Y<-batch %>% levels %>% sapply(as_mapper(~batch==.))
   if(scaleY) Y %<>% t %<>% divide_by(colSums(t(.))) %<>% t
-  data %>% t %>% prcomp(...) -> upca
-  data %>% multiply_by_matrix(Y) %>% t %>% prcomp(...) -> gpca
+  data %>% t %>% prcomp -> upca
+  data %>% multiply_by_matrix(Y) %>% t %>% prcomp -> gpca
   if(projected){
     gpca %>% predict(t(data)) -> gpca$x
     gpca$x %>% colSds -> gpca$sdev
@@ -50,7 +50,7 @@ plot.gpca<-function(object, what=c('guided','unguided','ranks','delta'), dims=c(
       xlab('Rank')+ylab('Cumulative variance')+labs(fill="gPC")
   )
 }
-
+#
 # viz_gpca<-function(object,dims=1:2,guided=TRUE){
 #   pca<-if(guided) object$gpca else object$upca
 #   ggplot()+aes(x=pca$x[,dims[1]],y=pca$x[,dims[2]],colour=object$batch)+
