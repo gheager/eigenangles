@@ -2,7 +2,7 @@ export(
   eigenangles,
   plot.eigenangles,
   tanmean,
-  plot.tanmean,
+  plot.eigenangles.tanmean,
   gPCA,
   print.gpca,
   plot.gpca,
