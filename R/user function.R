@@ -55,7 +55,7 @@
 # }
 
 apply_eigenangles<-function(..., uncorrected, group){
-  list(...) %>% map(do_eigenangles %>% partial(group=group,ref=uncorrected)) %>% 
+  list(...,uncorrected) %>% map(do_eigenangles %>% partial(group=group,ref=uncorrected)) %>% 
     imap(~mutate(.x,algorithm=.y)) %>% 
     purrr::reduce(rbind.fill) %>% as_tibble %>% structure(class=c('eigenangles',class(.)))
 }
@@ -91,5 +91,5 @@ extract_dim<-function(tbl,dim){
 # }
 # 
 do_gPCA<-function(experiment,...){
-  experiment %>% assays %>% use_series(corrected) %>% gPCA(batch=experiment$batch,...)
+  experiment %>% assays %>% extract2(1) %>% gPCA(batch=experiment$batch,...)
 }
