@@ -13,8 +13,7 @@ export(
 )
 
 import(purrr)
-importFrom(magrittr,`%>%`)
-importFrom(magrittr,`%<>%`)
+import(magrittr)
 import(ggplot2)
 import(ggforce)
 import(latex2exp)
