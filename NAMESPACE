@@ -8,8 +8,7 @@ export(
   plot.gpca,
   do_gPCA,
   do_eigenangles,
-  apply_eigenangles,
-  benchmark_eigenangles
+  apply_eigenangles
 )
 
 import(purrr)

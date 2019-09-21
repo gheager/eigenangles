@@ -47,35 +47,37 @@
 #     metadata=list(batch=batch)
 #   ))
 # }
+# 
+# benchmarkeigenangles<-function(directory, group){
+#   directory %>% dir %>% 
+#     map(~get(load(paste0(directory,'/',.x)))) %>% set_names(dir(directory)) %>% 
+#     do.call(apply_eigenangles %>% partial(group=group), .)
+# }
 
-benchmark_eigenangles<-function(directory, group){
-  directory %>% dir %>% 
-    map(~get(load(paste0(directory,'/',.x)))) %>% set_names(dir(directory)) %>% 
-    do.call(apply_eigenangles %>% partial(group=group), .)
-}
-
-apply_eigenangles<-function(...,group){
-  list(...) %>% map(do_eigenangles %>% partial(group=group)) %>% 
-    imap(~mutate(.x,algorithm_=.y)) %>% 
+apply_eigenangles<-function(..., uncorrected, group){
+  list(...) %>% map(do_eigenangles %>% partial(group=group,ref=uncorrected)) %>% 
+    imap(~mutate(.x,algorithm=.y)) %>% 
     purrr::reduce(rbind.fill) %>% as_tibble %>% structure(class=c('eigenangles',class(.)))
 }
 
-do_eigenangles<-function(experiment,group){
+do_eigenangles<-function(experiment,group,ref){
   if(!is.list(experiment)){
     return(eigenangles(
-      data=experiment %>% assays %>%extract2(1),
+      data=experiment %>% assays %>% extract2(1),
       batch=experiment$batch,
-      group=experiment[[group]]
+      group=experiment[[group]],
+      ref=ref %>% assays %>% extract2(1)
     ))
   }else{
     return(experiment %>% 
-             map(do_eigenangles %>% partial(group=group)) %>% 
-             imap(~mutate(.x,k_=.y)) %>% purrr::reduce(rbind))
+             map(do_eigenangles %>% partial(group=group, ref=ref)) %>% 
+             imap(~mutate(.x,k=.y)) %>% purrr::reduce(rbind))
   }
 }
 
 extract_dim<-function(tbl,dim){
-  tbl$angles_ %<>% map(~.x[dim %>% min(length(.x))]) %<>% unlist
+  tbl$integration_angles %<>% map(~.x[dim %>% min(length(.x))]) %<>% unlist
+  tbl$transformation_angles %<>% map(~.x[dim %>% min(length(.x))]) %<>% unlist
   return(tbl)
 }
 

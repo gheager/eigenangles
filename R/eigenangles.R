@@ -19,19 +19,33 @@ angles<-function(U,V){
   return(a)
 }
 
-eigenangles<-function(data,batch,group,scale=FALSE,center=TRUE,verbose=TRUE){
+eigenangles<-function(data,batch,group,ref=NULL){
   data%<>%t%<>%na.omit%<>%t
   batch%<>%factor; batch %>% levels -> batches
-  Y <- group %>% factor%>% levels %>% sapply(as_mapper(~group==.)) %>% t %>% divide_by(colSums(t(.))) %>% t
+  batch_PCAs <- batches %>% map(
+    function(b){
+      Yb <- group[batch==b] %>% factor %>% levels %>% sapply(as_mapper(~group[batch==b]==.)) %>% t %>% divide_by(colSums(t(.))) %>% t
+      return((data[,batch==b]%*%Yb) %>% t %>% prcomp %>% use_series(rotation))
+    }
+  ) %>% set_names(batches)
+  Y <- group %>% factor %>% levels %>% sapply(as_mapper(~group==.)) %>% t %>% divide_by(colSums(t(.))) %>% t
   return(tibble(
     batch_=batches,
-    angles_=batches %>% map(
+    integration_angles=batches %>% map(
       function(b){
         Ya <- Y[,group[batch==b] %>% unique]
-        Yb <- group[batch==b] %>% factor %>% levels %>% sapply(as_mapper(~group[batch==b]==.)) %>% t %>% divide_by(colSums(t(.))) %>% t
         return(angles(
           (data%*%Ya) %>% t %>% prcomp %>% use_series(rotation),
-          (data[,batch==b]%*%Yb) %>% t %>% prcomp %>% use_series(rotation)
+          batch_PCAs[[b]]
+        ))
+      }
+    ),
+    transformation_angles=batches %>% map(
+      function(b){
+        Yb <- group[batch==b] %>% factor %>% levels %>% sapply(as_mapper(~group[batch==b]==.)) %>% t %>% divide_by(colSums(t(.))) %>% t
+        return(angles(
+          batch_PCAs[[b]],
+          (ref[,batch==b]%*%Yb) %>% t %>% prcomp %>% use_series(rotation)
         ))
       }
     )
