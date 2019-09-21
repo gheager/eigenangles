@@ -64,7 +64,7 @@ do_eigenangles<-function(experiment,group){
   if(!is.list(experiment)){
     return(eigenangles(
       data=experiment %>% assays %>%extract2(1),
-      batch=experiment %>% metadata %>% use_series(batch),
+      batch=experiment$batch,
       group=experiment[[group]]
     ))
   }else{
