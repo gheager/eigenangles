@@ -1,15 +1,15 @@
 export(
   eigenangles,
-  gPCA,
-  compare.gpca,
-  correct.batch.effect,
-  integrate.experiments,
-  do_eigenangles,
-  do_gPCA,
-  plot.gpca,
   plot.eigenangles,
-  plot.eigenangles.batch_vs_all,
-  plot.eigenangles.inter_batch
+  tanmean,
+  plot.tanmean,
+  gPCA,
+  print.gpca,
+  plot.gpca,
+  do_gPCA,
+  do_eigenangles,
+  apply_eigenangles,
+  benchmark_eigenangles
 )
 
 import(purrr)

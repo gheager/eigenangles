@@ -175,27 +175,27 @@ plot.gpca<-function(object, what=c('guided','unguided','ranks','delta'), dims=c(
 #       geom_text(aes(x=gpca$delta,y=.1,label=gpca$p.value),colour='red')
 #   }
 # }
-
-compare.gpca<-function(corrected,raw,batch,tissue,guided=FALSE){
-  if(guided){
-    raw.pca<-raw$gpca
-    corrected.pca<-corrected$gpca
-  }else{
-    raw.pca<-raw$pca
-    corrected.pca<-corrected$pca
-  }
-  grid.arrange(ncol=2,nrow=2,
-               raw %>% viz_gpca(guided=guided) + geom_line(aes(group=tissue),colour='grey') + theme(legend.position = 'none'),
-               ggplot(mapping=aes(
-                 x=t(corrected$data)%*%raw.pca$v[,1],
-                 y=t(corrected$data)%*%raw.pca$v[,2],
-                 colour=batch
-               ))+geom_point()+stat_ellipse() + geom_line(aes(group=tissue),colour='grey') + theme(legend.position = 'none'),
-               ggplot(mapping=aes(
-                 x=t(raw$data)%*%corrected.pca$v[,1],
-                 y=t(raw$data)%*%corrected.pca$v[,2],
-                 colour=batch
-               ))+geom_point()+stat_ellipse() + geom_line(aes(group=tissue),colour='grey') + theme(legend.position = 'none'),
-               corrected %>% viz_gpca(guided=guided) + geom_line(aes(group=tissue),colour='grey') + theme(legend.position = 'none')
-  )
-}
+# 
+# compare.gpca<-function(corrected,raw,batch,tissue,guided=FALSE){
+#   if(guided){
+#     raw.pca<-raw$gpca
+#     corrected.pca<-corrected$gpca
+#   }else{
+#     raw.pca<-raw$pca
+#     corrected.pca<-corrected$pca
+#   }
+#   grid.arrange(ncol=2,nrow=2,
+#                raw %>% viz_gpca(guided=guided) + geom_line(aes(group=tissue),colour='grey') + theme(legend.position = 'none'),
+#                ggplot(mapping=aes(
+#                  x=t(corrected$data)%*%raw.pca$v[,1],
+#                  y=t(corrected$data)%*%raw.pca$v[,2],
+#                  colour=batch
+#                ))+geom_point()+stat_ellipse() + geom_line(aes(group=tissue),colour='grey') + theme(legend.position = 'none'),
+#                ggplot(mapping=aes(
+#                  x=t(raw$data)%*%corrected.pca$v[,1],
+#                  y=t(raw$data)%*%corrected.pca$v[,2],
+#                  colour=batch
+#                ))+geom_point()+stat_ellipse() + geom_line(aes(group=tissue),colour='grey') + theme(legend.position = 'none'),
+#                corrected %>% viz_gpca(guided=guided) + geom_line(aes(group=tissue),colour='grey') + theme(legend.position = 'none')
+#   )
+# }
