@@ -75,11 +75,6 @@ do_eigenangles<-function(experiment,group,ref){
   }
 }
 
-extract_dim<-function(tbl,dim){
-  tbl$integration_angles %<>% map(~.x[dim %>% min(length(.x))]) %<>% unlist
-  tbl$transformation_angles %<>% map(~.x[dim %>% min(length(.x))]) %<>% unlist
-  return(tbl)
-}
 
 # do_eigenangles<-function(experiment,group,...){
 #   eigenangles(
