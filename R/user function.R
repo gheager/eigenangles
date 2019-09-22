@@ -55,7 +55,7 @@
 # }
 
 apply_eigenangles<-function(..., uncorrected, group){
-  list(...,uncorrected) %>% map(do_eigenangles %>% partial(group=group,ref=uncorrected)) %>% 
+  list(...,uncorrected=uncorrected) %>% map(do_eigenangles %>% partial(group=group,ref=uncorrected)) %>% 
     imap(~mutate(.x,algorithm=.y)) %>% 
     purrr::reduce(rbind.fill) %>% as_tibble %>% structure(class=c('eigenangles',class(.)))
 }
