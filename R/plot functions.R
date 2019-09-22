@@ -14,7 +14,7 @@ plot.eigenangles<-function(tbl,dim=1){
     annotate(label='transformation',y=-2/3,x=max(tbl$k,na.rm=TRUE),geom='text')+
     facet_wrap(~batch_)
 }
-
+#
 # plot.eigenangles<-function(tbl,ref='none',dim=1){
 #   ggplot(tbl %>% extract_dim(dim))+
 #     aes(x=k_, y=angles_, colour=algorithm_)+
