@@ -9,7 +9,7 @@ plot.eigenangles<-function(tbl,dim=1){
     geom_hline(aes(yintercept = integration_angles*is.na(k), colour=algorithm))+
     geom_hline(aes(yintercept = -transformation_angles*is.na(k), colour=algorithm))+
     geom_hline(yintercept=0, colour='black')+
-    coord_polar(theta='y',start=pi,direction=-1)+ylim(c(-1,1))+
+    coord_polar(theta='y',start=pi,direction=-1)+ylim(c(-1,1))+xlim(c(0,max(tbl$k)))+
     annotate(label='integration',y=2/3,x=max(tbl$k,na.rm=TRUE),geom='text')+
     annotate(label='transformation',y=-2/3,x=max(tbl$k,na.rm=TRUE),geom='text')+
     facet_wrap(~batch_)
@@ -41,7 +41,7 @@ plot.eigenangles.tanmean<-function(tbl){
     geom_hline(aes(yintercept = integration_angles*is.na(k), colour=algorithm))+
     geom_hline(aes(yintercept = -transformation_angles*is.na(k), colour=algorithm))+
     geom_hline(yintercept=0, colour='black')+
-    coord_polar(theta='y',start=pi,direction=-1)+ylim(c(-1,1))+
+    coord_polar(theta='y',start=pi,direction=-1)+ylim(c(-1,1))+xlim(c(0,max(tbl$k)))+
     annotate(label='integration',y=2/3,x=max(tbl$k,na.rm=TRUE),geom='text')+
     annotate(label='transformation',y=-2/3,x=max(tbl$k,na.rm=TRUE),geom='text')
 }
