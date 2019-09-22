@@ -45,7 +45,7 @@ plot.eigenangles.tanmean<-function(tbl){
     annotate(label='integration',y=2/3,x=max(tbl$k,na.rm=TRUE),geom='text')+
     annotate(label='transformation',y=-2/3,x=max(tbl$k,na.rm=TRUE),geom='text')
 }
-
+#
 # plot.eigenangles.tanmean<-function(tbl,ref='none',dim=1){
 #   ggplot(tbl)+
 #     aes(x=k_, y=angles_, colour=algorithm_)+
