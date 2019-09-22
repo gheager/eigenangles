@@ -1,7 +1,3 @@
-library(tibble)
-library(dplyr)
-library(plyr)
-
 angledet<-function(U,V){
   U%<>%as.matrix; V%<>%as.matrix
   cbind(U,V) %>% qr %>% qr.R -> new.coord

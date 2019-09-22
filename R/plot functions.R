@@ -1,7 +1,3 @@
-library(magrittr)
-library(purrr)
-library(ggplot2)
-
 plot.eigenangles<-function(tbl,dim=1){
   ggplot(tbl %>% extract_dim(dim))+
     geom_point(aes(x=k, y=integration_angles, colour=algorithm))+
