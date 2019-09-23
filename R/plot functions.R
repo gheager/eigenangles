@@ -6,8 +6,8 @@ plot.eigenangles<-function(tbl,component=1){
     geom_hline(aes(yintercept = -transformation_angles*is.na(k), colour=algorithm))+
     geom_hline(yintercept=0, colour='black')+
     coord_polar(theta='y',start=pi,direction=-1)+ylim(c(-1,1))+xlim(c(0,max(tbl$k,na.rm=TRUE)))+
-    annotate(label='integration',y=2/3,x=max(tbl$k,na.rm=TRUE)/2,geom='text',size=2)+
-    annotate(label='conservation',y=-2/3,x=max(tbl$k,na.rm=TRUE)/2,geom='text',size=2)+
+    annotate(label='integration',y=2/3,x=max(tbl$k,na.rm=TRUE)/2,geom='text',size=3)+
+    annotate(label='conservation',y=-2/3,x=max(tbl$k,na.rm=TRUE)/2,geom='text',size=3)+
     facet_wrap(~batch_)
 }
 #
