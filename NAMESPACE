@@ -13,9 +13,9 @@ export(
   download_experiments_from_ExpressionAtlas,
   remove_isolated_experiments,
   merge_experiments,
-  correct_batch_effect
+  correct_batch_effect,
+  `%>%`
 )
-importFrom(magrittr, `%>%`)
 
 import(purrr)
 import(magrittr)
@@ -33,5 +33,6 @@ import(SummarizedExperiment)
 import(sva)
 import(RUVSeq)
 import(batchelor)
-import(igraph)
+importFrom(igraph, graph_from_adjacency_matrix)
+importFrom(igraph, plot.igraph)
 import(gtools)

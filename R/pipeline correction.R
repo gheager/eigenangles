@@ -10,6 +10,8 @@ library(sva) #for ComBat
 library(RUVSeq) #for RUVs
 library(batchelor) #for mnnCorrect
 
+`%>%`<-magrittr::`%>%`
+
 load_experiments<-function(directory){
   directory %>% dir %>% map(~get(load(paste0(directory,'/',.x)))$rnaseq) %>% 
     set_names(directory %>% dir %>% str_split('-') %>% map(~.x[2:3] %>% paste(collapse='')) %>% unlist)
