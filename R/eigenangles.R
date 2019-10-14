@@ -15,7 +15,7 @@ angles<-function(U,V){
   return(a)
 }
 
-eigenangles<-function(data,batch,group,ref=NULL){
+eigenangles<-function(data,batch,group,reference=NULL){
   data%<>%t%<>%na.omit%<>%t
   batch%<>%factor; batch %>% levels -> batches
   batch_PCAs <- batches %>% map(
@@ -36,12 +36,12 @@ eigenangles<-function(data,batch,group,ref=NULL){
         ))
       }
     ),
-    transformation_angles=batches %>% map(
+    conservation_angles=batches %>% map(
       function(b){
         Yb <- group[batch==b] %>% factor %>% levels %>% sapply(as_mapper(~group[batch==b]==.)) %>% t %>% divide_by(colSums(t(.))) %>% t
         return(angles(
           batch_PCAs[[b]],
-          (ref[,batch==b]%*%Yb) %>% t %>% prcomp %>% use_series(rotation)
+          (reference[,batch==b]%*%Yb) %>% t %>% prcomp %>% use_series(rotation)
         ))
       }
     )
