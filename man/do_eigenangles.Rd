@@ -20,9 +20,6 @@ do_eigenangles(experiment, group, ref)
 \value{
 A tibble of Eigengenes Angles.
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
 \author{Guillaume Heger, EMBL-EBI Trainee}
 \note{
 %%  ~~further notes~~
