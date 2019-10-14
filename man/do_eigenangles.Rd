@@ -36,4 +36,4 @@ A tibble of Eigengenes Angles.
 % R documentation directory.
 \keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
 \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
-\references{\link{https://www.researchgate.net/publication/336533527_A_geometrical_approach_based_on_PCA_to_benchmark_the_algorithms_of_batch_effect_correction_applied_to_the_integration_of_RNA-Seq_data}}
+\references{\url{https://www.researchgate.net/publication/336533527_A_geometrical_approach_based_on_PCA_to_benchmark_the_algorithms_of_batch_effect_correction_applied_to_the_integration_of_RNA-Seq_data}}

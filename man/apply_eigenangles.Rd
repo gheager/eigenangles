@@ -27,7 +27,7 @@ A tibble of four or five columns :
   \item{$integration_angles}{This is a list with the vectors of batch integration angles (each vector contains angles between the eigengenes of every rank of PCA).}
   \item{$conservation_angles}{This is a list with the vectors of batch conservation angles.}
 }
-\references{\link{https://www.researchgate.net/publication/336533527_A_geometrical_approach_based_on_PCA_to_benchmark_the_algorithms_of_batch_effect_correction_applied_to_the_integration_of_RNA-Seq_data}}
+\references{\url{https://www.researchgate.net/publication/336533527_A_geometrical_approach_based_on_PCA_to_benchmark_the_algorithms_of_batch_effect_correction_applied_to_the_integration_of_RNA-Seq_data}}
 \author{Guillaume Heger, EMBL-EBI Trainee}
 \note{
 %%  ~~further notes~~
