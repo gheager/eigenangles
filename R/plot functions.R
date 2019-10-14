@@ -1,9 +1,9 @@
 plot.eigenangles<-function(tbl,component=1){
   ggplot(tbl %>% extract_component(component))+
     geom_point(aes(x=k, y=integration_angles, colour=algorithm))+
-    geom_point(aes(x=k, y=-transformation_angles, colour=algorithm))+
+    geom_point(aes(x=k, y=-conservation_angles, colour=algorithm))+
     geom_hline(aes(yintercept = integration_angles*is.na(k), colour=algorithm))+
-    geom_hline(aes(yintercept = -transformation_angles*is.na(k), colour=algorithm))+
+    geom_hline(aes(yintercept = -conservation_angles*is.na(k), colour=algorithm))+
     geom_hline(yintercept=0, colour='black')+
     coord_polar(theta='y',start=pi,direction=-1)+ylim(c(-1,1))+xlim(c(0,max(tbl$k,na.rm=TRUE)))+
     annotate(label='integration',y=2/3,x=max(tbl$k,na.rm=TRUE)/2,geom='text',size=2)+
@@ -26,16 +26,16 @@ tanmean<-function(tbl, component=1){
     group_by(algorithm,k) %>% 
     dplyr::summarise(
       integration_angles=atan(mean(tanpi(integration_angles)))/pi,
-      transformation_angles=atan(mean(tanpi(transformation_angles)))/pi
+      conservation_angles=atan(mean(tanpi(conservation_angles)))/pi
     ) %>% structure(class=c('eigenangles.tanmean',class(.)))
 }
 
 plot.eigenangles.tanmean<-function(tbl){
   ggplot(tbl)+
     geom_point(aes(x=k, y=integration_angles, colour=algorithm))+
-    geom_point(aes(x=k, y=-transformation_angles, colour=algorithm))+
+    geom_point(aes(x=k, y=-conservation_angles, colour=algorithm))+
     geom_hline(aes(yintercept = integration_angles*is.na(k), colour=algorithm))+
-    geom_hline(aes(yintercept = -transformation_angles*is.na(k), colour=algorithm))+
+    geom_hline(aes(yintercept = -conservation_angles*is.na(k), colour=algorithm))+
     geom_hline(yintercept=0, colour='black')+
     coord_polar(theta='y',start=pi,direction=-1)+ylim(c(-1,1))+xlim(c(0,max(tbl$k,na.rm=TRUE)))+
     annotate(label='integration',y=2/3,x=max(tbl$k,na.rm=TRUE)/2,geom='text')+
@@ -44,7 +44,7 @@ plot.eigenangles.tanmean<-function(tbl){
 
 extract_component<-function(tbl,component){
   tbl$integration_angles %<>% map(~.x[component %>% min(length(.x))]) %<>% unlist
-  tbl$transformation_angles %<>% map(~.x[component %>% min(length(.x))]) %<>% unlist
+  tbl$conservation_angles %<>% map(~.x[component %>% min(length(.x))]) %<>% unlist
   return(tbl)
 }
 

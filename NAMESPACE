@@ -8,7 +8,13 @@ export(
   plot.gpca,
   do_gPCA,
   do_eigenangles,
-  apply_eigenangles
+  apply_eigenangles,
+  load_experiments,
+  download_experiments_from_ExpressionAtlas,
+  remove_isolated_experiments,
+  merge_experiments,
+  correct_batch_effect
+  magrittr::`%>%`
 )
 
 import(purrr)
@@ -27,3 +33,5 @@ import(SummarizedExperiment)
 import(sva)
 import(RUVSeq)
 import(batchelor)
+import(igraph)
+import(gtools)

@@ -6,13 +6,13 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-gPCA(data,batch,projected=TRUE,scaleY=TRUE,nperm=0,...)
+gPCA(data,batch,scaleY=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{data}{An expression matrix with genes as rows and samples as columns.}
   \item{batch}{A vector indicating the groups to which the samples belong.}
-  \item{...}{Parameters for PCA, i.e. arguments to provide to function `prcomp`.}
+  \item{scaleY}{A logical indicating if the batches should be averaged or summed. Default is \code{TRUE} which means the batches are averaged.}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~

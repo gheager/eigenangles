@@ -55,22 +55,22 @@
 # }
 
 apply_eigenangles<-function(..., uncorrected, group){
-  list(...,uncorrected=uncorrected) %>% map(do_eigenangles %>% partial(group=group,ref=uncorrected)) %>% 
+  list(...,uncorrected=uncorrected) %>% map(do_eigenangles %>% partial(group=group,reference=uncorrected)) %>% 
     imap(~mutate(.x,algorithm=.y)) %>% 
     purrr::reduce(rbind.fill) %>% as_tibble %>% structure(class=c('eigenangles',class(.)))
 }
 
-do_eigenangles<-function(experiment,group,ref){
+do_eigenangles<-function(experiment,group,reference){
   if(!is.list(experiment)){
     return(eigenangles(
       data=experiment %>% assays %>% extract2(1),
       batch=experiment$batch,
       group=experiment[[group]],
-      ref=ref %>% assays %>% extract2(1)
+      reference=reference %>% assays %>% extract2(1)
     ))
   }else{
     return(experiment %>% 
-             map(do_eigenangles %>% partial(group=group, ref=ref)) %>% 
+             map(do_eigenangles %>% partial(group=group, reference=reference)) %>% 
              imap(~mutate(.x,k=.y)) %>% purrr::reduce(rbind))
   }
 }
