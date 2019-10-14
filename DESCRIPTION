@@ -11,3 +11,4 @@ Encoding: UTF-8
 LazyData: true
 biocViews:
 Imports: magrittr, purrr, ggplot2, ggforce, latex2exp, gridExtra, SummarizedExperiment, parallel, doSNOW, sva, RUVSeq, batchelor
+Depends: magrittr

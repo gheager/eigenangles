@@ -13,8 +13,7 @@ export(
   download_experiments_from_ExpressionAtlas,
   remove_isolated_experiments,
   merge_experiments,
-  correct_batch_effect,
-  %>%
+  correct_batch_effect
 )
 
 import(purrr)
