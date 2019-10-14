@@ -15,7 +15,7 @@ export(
   merge_experiments,
   correct_batch_effect
 )
-exportFrom(magrittr, `%>%`)
+importFrom(magrittr, `%>%`)
 
 import(purrr)
 import(magrittr)
