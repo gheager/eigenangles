@@ -14,7 +14,7 @@ export(
   remove_isolated_experiments,
   merge_experiments,
   correct_batch_effect,
-  magrittr::`%>%`
+  `%>%`
 )
 
 import(purrr)
