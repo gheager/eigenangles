@@ -10,9 +10,10 @@ library(sva) #for ComBat
 library(RUVSeq) #for RUVs
 library(batchelor) #for mnnCorrect
 
-load_experiments<-function(directory, item.SimpleList='rnaseq'){
-  directory %>% dir %>% map(~get(load(paste0(directory,'/',.x))) %>% (if(class(.)=='SimpleList') as_mapper(~.[[item.SimpleList]]) else identity)) %>% 
-    set_names(directory %>% dir %>% str_split('-') %>% map(~.x[2:3] %>% paste(collapse='')) %>% unlist)
+load_experiments<-function(directory, names=dir(directory), item.SimpleList='rnaseq'){
+  directory %>% dir %>% 
+    map(~get(load(paste0(directory,'/',.x))) %>% (if(class(.)=='SimpleList') as_mapper(~.[[item.SimpleList]]) else identity)) %>% 
+    set_names(names)
 }
 
 download_experiments_from_ExpressionAtlas<-function(..., destdir=getwd() %>% paste('experiments',sep='/')){
@@ -54,15 +55,36 @@ remove_isolated_experiments<-function(experiments, biological.group){
   return(experiments)
 }
 
-merge_experiments<-function(experiments, log, filter.unexpressed.genes){
-  UseMethod("merge_experiments")
+access_data<-function(experiment) UseMethod("access_data")
+access_data.SummarizedExperiment<-function(experiment){
+  return(experiment@assays$data$counts)
+}
+access_data.ExpressionSet<-function(experiment){
+  return(experiment@assayData$exprs)
 }
 
-merge_experiments.SummarizedExperiment <- function(experiments, log=TRUE, filter.unexpressed.genes=TRUE){
+access_pheno<-function(experiment) UseMethod("access_pheno")
+access_pheno.SummarizedExperiment<-function(experiment){
+  return(experiment@colData)
+}
+access_pheno.ExpressionSet<-function(experiment){
+  return(experiment@phenoData)
+}
+
+access_meta<-function(experiment) UseMethod("access_meta")
+access_meta.SummarizedExperiment<-function(experiment){
+  return(experiment@metadata)
+}
+access_meta.ExpressionSet<-function(experiment){
+  return(experiment@experimentData)
+}
+
+merge_experiments <- function(experiments, log=TRUE, filter.unexpressed.genes=TRUE, force=FALSE){
+  if(experiments %>% map(class) %>% unlist %>% unique %>% length %>% is_greater_than(1) & !force) stop("The experiments must have the same class. Their classes are :\n", experiments %>% map(class) %>% unlist)
   genes<-experiments %>% map(rownames)
   shared.genes<-genes %>% purrr::reduce(intersect)
   unshared.genes<-genes %>% map(setdiff %>% partial(y=shared.genes))
-  data<-experiments %>% map(~.x@assays$data$counts %>% extract(rownames(.x)%in%shared.genes,)) %>% purrr::reduce(cbind)
+  data<-experiments %>% map(~.x %>% access_data %>% extract(shared.genes,)) %>% purrr::reduce(cbind)
   warning(unshared.genes %>% unlist %>% unique %>% length,' genes have been removed as they are not shared across the batches.')
   batch<-experiments %>% imap(~.y %>% rep(ncol(.x))) %>% unlist(use.names=FALSE) %>% factor
   if(filter.unexpressed.genes){
@@ -71,32 +93,42 @@ merge_experiments.SummarizedExperiment <- function(experiments, log=TRUE, filter
     message(sum(unexpressed.genes),' genes have been removed as they were unexpressed across the samples of a batch.')
   }
   if(log) data%<>%log1p
-  return(SummarizedExperiment(
-    assays=if(log) list(log_counts=data) else list(counts=data),
-    colData=experiments %>% map(colData) %>% smartbind(list=.) %>% set_rownames(experiments %>% map(colnames) %>% unlist) %>% cbind(batch),
-    metadata=list(batch=batch)
+  return(switch(
+    class(experiments[[1]]),
+    SummarizedExperiment=,RangedSummarizedExperiment=
+      SummarizedExperiment(
+        assays=if(log) list(log_counts=data) else list(counts=data),
+        colData=experiments %>% map(colData) %>% smartbind(list=.) %>% set_rownames(experiments %>% map(colnames) %>% unlist) %>% cbind(batch),
+        metadata=list(batch=batch)
+      ),
+    ExpressionSet=
+      ExpressionSet(
+        assayData=if(log) list(log_exprs=data) else list(exprs=data),
+        phenoData=experiments %>% map(phenoData) %>% smartbind(list=.) %>% set_rownames(experiments %>% map(colnames) %>% unlist) %>% cbind(batch),
+        experimentData=list(batch=batch)
+      )
   ))
 }
 
-merge_experiments.ExpressionSet <- function(experiments, log=FALSE, filter.unexpressed.genes=TRUE){
-  genes<-experiments %>% map(rownames)
-  shared.genes<-genes %>% purrr::reduce(intersect)
-  unshared.genes<-genes %>% map(setdiff %>% partial(y=shared.genes))
-  data<-experiments %>% map(~.x@assayData$exprs %>% extract(rownames(.x)%in%shared.genes,)) %>% purrr::reduce(cbind)
-  warning(unshared.genes %>% unlist %>% unique %>% length,' genes have been removed as they are not shared across the batches.')
-  batch<-experiments %>% imap(~.y %>% rep(ncol(.x))) %>% unlist(use.names=FALSE) %>% factor
-  if(filter.unexpressed.genes){
-    unexpressed.genes <- data %>% t %>% data.frame %>% split(batch) %>% map(~colSums(.)==0) %>% purrr::reduce(`&`)
-    data%<>%extract(!unexpressed.genes,)
-    message(sum(unexpressed.genes),' genes have been removed as they were unexpressed across the samples of a batch.')
-  }
-  if(log) data%<>%log1p
-  return(ExpressionSet(
-    assayData=if(log) list(log_exprs=data) else list(exprs=data),
-    phenoData=experiments %>% map(phenoData) %>% smartbind(list=.) %>% set_rownames(experiments %>% map(colnames) %>% unlist) %>% cbind(batch),
-    experimentData=list(batch=batch)
-  ))
-}
+# merge_experiments.ExpressionSet <- function(experiments, log=FALSE, filter.unexpressed.genes=TRUE){
+#   genes<-experiments %>% map(rownames)
+#   shared.genes<-genes %>% purrr::reduce(intersect)
+#   unshared.genes<-genes %>% map(setdiff %>% partial(y=shared.genes))
+#   data<-experiments %>% map(~.x@assayData$exprs %>% extract(shared.genes,)) %>% purrr::reduce(cbind)
+#   warning(unshared.genes %>% unlist %>% unique %>% length,' genes have been removed as they are not shared across the batches.')
+#   batch<-experiments %>% imap(~.y %>% rep(ncol(.x))) %>% unlist(use.names=FALSE) %>% factor
+#   if(filter.unexpressed.genes){
+#     unexpressed.genes <- data %>% t %>% data.frame %>% split(batch) %>% map(~colSums(.)==0) %>% purrr::reduce(`&`)
+#     data%<>%extract(!unexpressed.genes,)
+#     message(sum(unexpressed.genes),' genes have been removed as they were unexpressed across the samples of a batch.')
+#   }
+#   if(log) data%<>%log1p
+#   return(ExpressionSet(
+#     assayData=if(log) list(log_exprs=data) else list(exprs=data),
+#     phenoData=experiments %>% map(phenoData) %>% smartbind(list=.) %>% set_rownames(experiments %>% map(colnames) %>% unlist) %>% cbind(batch),
+#     experimentData=list(batch=batch)
+#   ))
+# }
 
 correct_batch_effect<-function(experiment, model, method=c('ComBat','RUV','MNN'), k){
   UseMethod("correct_batch_effect")

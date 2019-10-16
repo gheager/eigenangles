@@ -8,13 +8,14 @@ Rough merger of experiments
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-merge_experiments(experiments, log, filter.unexpressed.genes)
+merge_experiments(experiments, log, filter.unexpressed.genes, force=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{experiments}{A list of wrapped experiments.}
   \item{log}{A logical indicationg whether the data shall be log-transformed.}
   \item{filter.unexpressed.genes}{A logical indicating if the genes that are unexpressed across all the samples of a batch shall be removed. This is for the proper functioning of the current version of ComBat in \code{correct_batch_effect}.}
+  \item{force}{A logical. If the experiments of the list are of different classes, the function is stopped, unless \code{force=TRUE}.}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
