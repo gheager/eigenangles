@@ -2,7 +2,7 @@
 \alias{merge_experiments}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+Rough merger of experiments
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
@@ -23,7 +23,7 @@ merge_experiments(experiments, log, filter.unexpressed.genes)
 A wrapped experiment.
 }
 \references{
-Rough merger of experiments
+
 }
 \author{Guillaume Heger, EMBL-EBI Trainee}
 \note{
