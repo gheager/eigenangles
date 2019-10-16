@@ -23,7 +23,7 @@ merge_experiments(experiments, log, filter.unexpressed.genes)
 A wrapped experiment.
 }
 \references{
-%% ~put references to the literature/web site here ~
+Rough merger of experiments
 }
 \author{Guillaume Heger, EMBL-EBI Trainee}
 \note{
