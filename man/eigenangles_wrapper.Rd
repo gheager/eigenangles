@@ -1,17 +1,17 @@
-\name{do_eigenangles}
-\alias{do_eigenangles}
+\name{eigenangles_wrapper}
+\alias{eigenangles_wrapper}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Eigengenes Angles for a wrapped integrated dataset}
 \description{
 Apply \code{eigenangles} to a wrapped integrated experiment.
 }
 \usage{
-do_eigenangles(experiment, group, ref)
+eigenangles_wrapper(experiment, biological.group, ref)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{experiment}{A \code{SummarizedExperiment} object corresponding to a corrected integrated dataset.}
-  \item{group}{A character string giving the name of the column of \code{colData(experiment)} to use as biological covariate.}
+  \item{biological.group}{A character string giving the name of the column of \code{colData(experiment)} to use as biological covariate.}
   \item{reference}{A \code{SummarizedExperiment} corresponding to the uncorrected dataset.}
 }
 \details{

@@ -1,5 +1,5 @@
-\name{apply_eigenangles}
-\alias{apply_eigenangles}
+\name{eigenangles_benchmark}
+\alias{eigenangles_benchmark}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Eigengenes Angles to benchmark methods of batch effect correction
@@ -8,13 +8,13 @@ Eigengenes Angles to benchmark methods of batch effect correction
 Apply \code{eigenangles} to a set of corrected datasets from different correction methods.
 }
 \usage{
-apply_eigenangles(..., uncorrected, group)
+eigenangles_benchmark(..., uncorrected, biological.group)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{...}{Multiple arguments corresponding to as many corrected datasets (\code{SummarizedExperiment} objects) as wanted to be compared. These arguments should be named according to the correction method used, in order to identify them easily in the result.}
   \item{uncorrected}{A dataset (\code{SummarizedExperiment}) that is the uncorrected dataset. This has to be declared independantly to be identified as the reference for angles of batch conservation.}
-  \item{group}{A character string giving the name of the column of the \code{colData()} field of each experiment to use as biological covariate.}
+  \item{biological.group}{A character string giving the name of the column of the \code{colData()} field of each experiment to use as biological covariate.}
 }
 \details{
 Arguments in the ellipsis \code{...} can be \code{SummarizedExperiment} datasets or lists of \code{SummarizedExperiment} datasets. A list of \code{SummarizedExperiment} datasets can be used to gather datasets that have been corrected using the same method but with different values of a parameter k (if applicable to this correction method). This k parameter will be displayed in the \code{$k} column of the result, if applicable.
@@ -37,7 +37,7 @@ A tibble of four or five columns :
 
 \seealso{
   \code{\link{eigenangles}},
-  \code{\link{do_eigenangles}}
+  \code{\link{eigenangles_wrapper}}
 }
 \examples{
 }

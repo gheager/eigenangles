@@ -1,3 +1,41 @@
+eigenangles_wrapper<-function(experiment, biological.group, reference){
+  UseMethod("eigenangles_wrapper")
+}
+
+eigenangles_wrapper.SummarizedExperiment<-function(experiment, biological.group, reference){
+  return(eigenangles(
+    data=experiment %>% assays %>% extract2(1),
+    batch=experiment$batch,
+    biological.group=experiment[[biological.group]],
+    reference=reference %>% assays %>% extract2(1)
+  ))
+}
+
+eigenangles_wrapper.ExpressionSet<-function(experiment, biological.group, reference){
+  return(eigenangles(
+    data=experiment %>% exprs,
+    batch=experiment$batch,
+    biological.group=experiment[[biological.group]],
+    reference=reference %>% exprs
+  ))
+}
+
+eigenangles_wrapper.list<-function(experiment, biological.group, reference){
+  return(experiment %>% 
+           map(eigenangles_wrapper %>% partial(biological.group=biological.group, reference=reference)) %>% 
+           imap(~mutate(.x,k=.y)) %>% purrr::reduce(rbind))
+}
+
+eigenangles_benchmark<-function(..., uncorrected, biological.group){
+  list(...,uncorrected=uncorrected) %>% map(eigenangles_wrapper %>% partial(biological.group=biological.group,reference=uncorrected)) %>% 
+    imap(~mutate(.x,algorithm=.y)) %>% 
+    purrr::reduce(rbind.fill) %>% as_tibble %>% structure(class=c('eigenangles',class(.)))
+}
+
+do_gPCA<-function(experiment,...){
+  experiment %>% assays %>% extract2(1) %>% gPCA(batch=experiment$batch,...)
+}
+
 # correct.batch.effect<-function(data,batch,
 #                                method=c('none','combat','ruv','mnn'),
 #                                model=NULL,model.data,log=TRUE,k=1){
@@ -53,38 +91,11 @@
 #     map(~get(load(paste0(directory,'/',.x)))) %>% set_names(dir(directory)) %>% 
 #     do.call(apply_eigenangles %>% partial(group=group), .)
 # }
-
-apply_eigenangles<-function(..., uncorrected, group){
-  list(...,uncorrected=uncorrected) %>% map(do_eigenangles %>% partial(group=group,reference=uncorrected)) %>% 
-    imap(~mutate(.x,algorithm=.y)) %>% 
-    purrr::reduce(rbind.fill) %>% as_tibble %>% structure(class=c('eigenangles',class(.)))
-}
-
-do_eigenangles<-function(experiment,group,reference){
-  if(!is.list(experiment)){
-    return(eigenangles(
-      data=experiment %>% assays %>% extract2(1),
-      batch=experiment$batch,
-      group=experiment[[group]],
-      reference=reference %>% assays %>% extract2(1)
-    ))
-  }else{
-    return(experiment %>% 
-             map(do_eigenangles %>% partial(group=group, reference=reference)) %>% 
-             imap(~mutate(.x,k=.y)) %>% purrr::reduce(rbind))
-  }
-}
-
-
-# do_eigenangles<-function(experiment,group,...){
+# do_eigenangles<-function(experiment,biological.group,...){
 #   eigenangles(
 #     data=experiment %>% assays %>% use_series(corrected),
 #     batch=experiment %>% metadata %>% use_series(batch),
-#     group=experiment[[group]],
+#     biological.group=experiment[[biological.group]],
 #     ...
 #   )
 # }
-# 
-do_gPCA<-function(experiment,...){
-  experiment %>% assays %>% extract2(1) %>% gPCA(batch=experiment$batch,...)
-}
