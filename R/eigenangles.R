@@ -15,21 +15,21 @@ angles<-function(U,V){
   return(a)
 }
 
-eigenangles<-function(data,batch,group,reference=NULL){
+eigenangles<-function(data,batch,biological.group,reference=NULL){
   data%<>%t%<>%na.omit%<>%t
   batch%<>%factor; batch %>% levels -> batches
   batch_PCAs <- batches %>% map(
     function(b){
-      Yb <- group[batch==b] %>% factor %>% levels %>% sapply(as_mapper(~group[batch==b]==.)) %>% t %>% divide_by(colSums(t(.))) %>% t
+      Yb <- biological.group[batch==b] %>% factor %>% levels %>% sapply(as_mapper(~biological.group[batch==b]==.)) %>% t %>% divide_by(colSums(t(.))) %>% t
       return((data[,batch==b]%*%Yb) %>% t %>% prcomp %>% use_series(rotation))
     }
   ) %>% set_names(batches)
-  Y <- group %>% factor %>% levels %>% sapply(as_mapper(~group==.)) %>% t %>% divide_by(colSums(t(.))) %>% t
+  Y <- biological.group %>% factor %>% levels %>% sapply(as_mapper(~biological.group==.)) %>% t %>% divide_by(colSums(t(.))) %>% t
   return(tibble(
     batch_=batches,
     integration_angles=batches %>% map(
       function(b){
-        Ya <- Y[,group[batch==b] %>% unique]
+        Ya <- Y[,biological.group[batch==b] %>% unique]
         return(angles(
           (data%*%Ya) %>% t %>% prcomp %>% use_series(rotation),
           batch_PCAs[[b]]
@@ -38,7 +38,7 @@ eigenangles<-function(data,batch,group,reference=NULL){
     ),
     conservation_angles=batches %>% map(
       function(b){
-        Yb <- group[batch==b] %>% factor %>% levels %>% sapply(as_mapper(~group[batch==b]==.)) %>% t %>% divide_by(colSums(t(.))) %>% t
+        Yb <- biological.group[batch==b] %>% factor %>% levels %>% sapply(as_mapper(~biological.group[batch==b]==.)) %>% t %>% divide_by(colSums(t(.))) %>% t
         return(angles(
           batch_PCAs[[b]],
           (reference[,batch==b]%*%Yb) %>% t %>% prcomp %>% use_series(rotation)
