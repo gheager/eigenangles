@@ -61,7 +61,7 @@ tanmean.eigenangles.parametric<-function(tbl, component=1){
     dplyr::summarise(
       integration_angles=atan(mean(tanpi(integration_angles)))/pi,
       conservation_angles=atan(mean(tanpi(conservation_angles)))/pi
-    ) %>% structure(class=c('eigenangles.tanmean',class(.)))
+    ) %>% structure(class=c('eigenangles.tanmean.parametric',class(.)))
 }
 
 tanmean.eigenangles.benchmark<-function(tbl, component=1){
