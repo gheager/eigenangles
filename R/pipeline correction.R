@@ -85,7 +85,7 @@ access_meta.ExpressionSet<-function(experiment){
   return(experiment@protocolData@data)
 }
 
-merge_experiments <- function(experiments, log, filter.unexpressed.genes=TRUE, force=FALSE){
+merge_experiments <- function(experiments, filter.unexpressed.genes=TRUE, log, force=FALSE){
   if(experiments %>% map(class) %>% unlist %>% unique %>% length %>% is_greater_than(1) & !force) stop("The experiments must have the same class. Their classes are :\n", experiments %>% map(class) %>% unlist)
   genes<-experiments %>% map(rownames)
   shared.genes<-genes %>% purrr::reduce(intersect)
@@ -98,11 +98,19 @@ merge_experiments <- function(experiments, log, filter.unexpressed.genes=TRUE, f
     data%<>%extract(!unexpressed.genes,)
     message(sum(unexpressed.genes),' genes have been removed as they were unexpressed across the samples of a batch.')
   }
+  if(missing(log)){
+    log<-switch(
+      class(experiments[[1]]),
+      SummarizedExperiment=, RangedSummarizedExperiment=TRUE,
+      ExpressionSet=FALSE
+    )
+  }
+  if(log) data %<>% log1p
   return(switch(
     class(experiments[[1]]),
     SummarizedExperiment=,RangedSummarizedExperiment=
       SummarizedExperiment(
-        assays=list(counts=data),
+        assays=if(log) list(log_counts=data) else list(counts=data),
         colData=experiments %>% map(colData) %>% smartbind(list=.) %>% set_rownames(experiments %>% map(colnames) %>% unlist) %>% cbind(batch),
         metadata=list(batch=batch)
       ),
@@ -134,13 +142,13 @@ merge_experiments <- function(experiments, log, filter.unexpressed.genes=TRUE, f
 #   ))
 # }
 
-correct_batch_effect<-function(experiment, model, method=c('ComBat','RUV','MNN'), k, log){
+correct_batch_effect<-function(experiment, model, method=c('ComBat','RUV','MNN'), k){
   UseMethod("correct_batch_effect")
 }
 
-correct_batch_effect.SummarizedExperiment<-function(experiment, model, method, k=NULL, log=TRUE){
-  #log<-experiment@assays$data %>% names %>% switch(log_counts=TRUE, counts=FALSE)
-  data <- experiment@assays$data$counts %>% (if(log) log1p else identity)
+correct_batch_effect.SummarizedExperiment<-function(experiment, model, method, k=NULL){
+  log<-experiment@assays$data %>% names %>% switch(log_counts=TRUE, counts=FALSE)
+  data <- experiment@assays$data$counts
   model.data<-model.frame(model, experiment@colData[all.vars(model)])
   if(length(k)==1|method=='ComBat'){
     return(SummarizedExperiment(
@@ -159,9 +167,9 @@ correct_batch_effect.SummarizedExperiment<-function(experiment, model, method, k
   }
 }
 
-correct_batch_effect.ExpressionSet<-function(experiment, model, method, k=NULL, log=FALSE){
+correct_batch_effect.ExpressionSet<-function(experiment, model, method, k=NULL){
   #log<-experiment@assayData$exprs %>% names %>% switch(log_exprs=TRUE, exprs=FALSE)
-  data <- experiment@assayData$exprs %>% (if(log) log1p else identity)
+  data <- experiment@assayData$exprs
   model.data<-model.frame(model, experiment@phenoData@data[all.vars(model)])
   if(length(k)==1|method=='ComBat'){
     return(ExpressionSet(

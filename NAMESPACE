@@ -1,8 +1,8 @@
 export(
   eigenangles,
   plot.eigenangles, plot.eigenangles.parametric, plot.eigenangles.benchmark,
-  tanmean,
-  plot.eigenangles.tanmean,
+  tanmean, tanmean.eigenangles, tanmean.eigenangles.benchmark,
+  plot.eigenangles.tanmean, plot.eigenangles.benchmark.tanmean,
   gPCA,
   print.gpca,
   plot.gpca,
