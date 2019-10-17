@@ -1,4 +1,28 @@
-plot.eigenangles<-function(tbl,component=1){
+plot.eigenangles<-function(tbl,component=1, colour='blue'){
+  ggplot(tbl %>% extract_component(component))+
+    geom_hline(aes(yintercept = integration_angles), colour=colour)+
+    geom_hline(aes(yintercept = -conservation_angles), colour=colour)+
+    geom_hline(yintercept=0, colour='black')+
+    coord_polar(theta='y',start=pi,direction=-1)+ylim(c(-1,1))+xlim(c(0,1))+
+    annotate(label='integration',y=2/3,x=1/2,geom='text',size=2)+
+    annotate(label='conservation',y=-2/3,x=1/2,geom='text',size=2)+
+    facet_wrap(~batch_)
+}
+
+plot.eigenangles.parametric<-function(tbl,component=1, colour='blue'){
+  ggplot(tbl %>% extract_component(component))+
+    geom_point(aes(x=k, y=integration_angles), colour=colour)+
+    geom_point(aes(x=k, y=-conservation_angles), colour=colour)+
+    geom_hline(aes(yintercept = integration_angles*is.na(k)), colour=colour)+
+    geom_hline(aes(yintercept = -conservation_angles*is.na(k)), colour=colour)+
+    geom_hline(yintercept=0, colour='black')+
+    coord_polar(theta='y',start=pi,direction=-1)+ylim(c(-1,1))+xlim(c(0,max(tbl$k,na.rm=TRUE)))+
+    annotate(label='integration',y=2/3,x=max(tbl$k,na.rm=TRUE)/2,geom='text',size=2)+
+    annotate(label='conservation',y=-2/3,x=max(tbl$k,na.rm=TRUE)/2,geom='text',size=2)+
+    facet_wrap(~batch_)
+}
+
+plot.eigenangles.benchmark<-function(tbl,component=1){
   ggplot(tbl %>% extract_component(component))+
     geom_point(aes(x=k, y=integration_angles, colour=algorithm))+
     geom_point(aes(x=k, y=-conservation_angles, colour=algorithm))+

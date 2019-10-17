@@ -23,13 +23,14 @@ eigenangles_wrapper.ExpressionSet<-function(experiment, biological.group, refere
 eigenangles_wrapper.list<-function(experiment, biological.group, reference){
   return(experiment %>% 
            map(eigenangles_wrapper %>% partial(biological.group=biological.group, reference=reference)) %>% 
-           imap(~mutate(.x,k=.y)) %>% purrr::reduce(rbind))
+           imap(~mutate(.x,k=.y)) %>% purrr::reduce(rbind) %>% 
+           structure(class=c('eigenangles.parametric',class(.))))
 }
 
 eigenangles_benchmark<-function(..., uncorrected, biological.group){
   list(...,uncorrected=uncorrected) %>% map(eigenangles_wrapper %>% partial(biological.group=biological.group,reference=uncorrected)) %>% 
     imap(~mutate(.x,algorithm=.y)) %>% 
-    purrr::reduce(rbind.fill) %>% as_tibble %>% structure(class=c('eigenangles',class(.)))
+    purrr::reduce(rbind.fill) %>% as_tibble %>% structure(class=c('eigenangles.benchmark','eigenangles',class(.)))
 }
 
 do_gPCA<-function(experiment,...){

@@ -7,7 +7,7 @@ export(
   print.gpca,
   plot.gpca,
   do_gPCA,
-  eigenangles_wrapper, eigenangles_wrapper.SummarizedExperiment, eigenangles_wrapper.ExpressionSet,
+  eigenangles_wrapper, eigenangles_wrapper.SummarizedExperiment, eigenangles_wrapper.ExpressionSet, eigenangles_wrapper.list,
   eigenangles_benchmark,
   load_experiments,
   download_experiments_from_ExpressionAtlas,
