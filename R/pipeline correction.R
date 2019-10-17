@@ -82,7 +82,7 @@ access_meta.ExpressionSet<-function(experiment){
   return(experiment@protocolData@data)
 }
 
-merge_experiments <- function(experiments, log=TRUE, filter.unexpressed.genes=TRUE, force=FALSE){
+merge_experiments <- function(experiments, log, filter.unexpressed.genes=TRUE, force=FALSE){
   if(experiments %>% map(class) %>% unlist %>% unique %>% length %>% is_greater_than(1) & !force) stop("The experiments must have the same class. Their classes are :\n", experiments %>% map(class) %>% unlist)
   genes<-experiments %>% map(rownames)
   shared.genes<-genes %>% purrr::reduce(intersect)
@@ -95,12 +95,11 @@ merge_experiments <- function(experiments, log=TRUE, filter.unexpressed.genes=TR
     data%<>%extract(!unexpressed.genes,)
     message(sum(unexpressed.genes),' genes have been removed as they were unexpressed across the samples of a batch.')
   }
-  if(log) data%<>%log1p
   return(switch(
     class(experiments[[1]]),
     SummarizedExperiment=,RangedSummarizedExperiment=
       SummarizedExperiment(
-        assays=if(log) list(log_counts=data) else list(counts=data),
+        assays=list(counts=data),
         colData=experiments %>% map(colData) %>% smartbind(list=.) %>% set_rownames(experiments %>% map(colnames) %>% unlist) %>% cbind(batch),
         metadata=list(batch=batch)
       ),
@@ -132,21 +131,22 @@ merge_experiments <- function(experiments, log=TRUE, filter.unexpressed.genes=TR
 #   ))
 # }
 
-correct_batch_effect<-function(experiment, model, method=c('ComBat','RUV','MNN'), k=NULL){
+correct_batch_effect<-function(experiment, model, method=c('ComBat','RUV','MNN'), k, log){
   UseMethod("correct_batch_effect")
 }
 
-correct_batch_effect.SummarizedExperiment<-function(experiment, model, method=c('ComBat','RUV','MNN'), k){
-  log<-experiment@assays$data %>% names %>% switch(log_counts=TRUE, counts=FALSE)
+correct_batch_effect.SummarizedExperiment<-function(experiment, model, method, k=NULL, log=TRUE){
+  #log<-experiment@assays$data %>% names %>% switch(log_counts=TRUE, counts=FALSE)
+  data <- experiment@assays$data$counts %>% (if(log) log1p else identity)
   model.data<-model.frame(model, experiment@colData[all.vars(model)])
   if(length(k)==1|method=='ComBat'){
     return(SummarizedExperiment(
       assays = list(switch(
         method,
-        ComBat = ComBat(experiment@assays$data[[1]], experiment$batch, mod=model.matrix(model, data=model.data)),
-        RUV = RUVs(experiment@assays$data[[1]], cIdx=seq_len(nrow(experiment@assays$data[[1]])), k=k, 
-                   scIdx=model.data %>% expand.grid %>% apply(1,paste) %>% makeGroups, isLog=log)$normalizedCounts,
-        MNN = mnnCorrect(experiment@assays$data[[1]], batch=experiment$batch, k=k)@assays$data$corrected
+        ComBat = ComBat(data, experiment$batch, mod=model.matrix(model, data=model.data)),
+        RUV = RUVs(data, cIdx=seq_len(nrow(data)), k=k,
+                   scIdx=model.data %>% expand.grid %>% apply(1,paste) %>% makeGroups, isLog=TRUE)$normalizedCounts,
+        MNN = mnnCorrect(data, batch=experiment$batch, k=k)@assays$data$corrected
       )) %>% set_names(if(log) 'corrected_log_counts' else 'corrected_counts'),
       colData = experiment@colData,
       metadata = experiment@metadata
@@ -156,17 +156,18 @@ correct_batch_effect.SummarizedExperiment<-function(experiment, model, method=c(
   }
 }
 
-correct_batch_effect.ExpressionSet<-function(experiment, model, method=c('ComBat','RUV','MNN'), k){
+correct_batch_effect.ExpressionSet<-function(experiment, model, method, k=NULL, log=FALSE){
   #log<-experiment@assayData$exprs %>% names %>% switch(log_exprs=TRUE, exprs=FALSE)
+  data <- experiment@assayData$exprs %>% (if(log) log1p else identity)
   model.data<-model.frame(model, experiment@phenoData@data[all.vars(model)])
   if(length(k)==1|method=='ComBat'){
     return(ExpressionSet(
       assayData = switch(
         method,
-        ComBat = ComBat(experiment@assayData$exprs, experiment$batch, mod=model.matrix(model, data=model.data)),
-        RUV = RUVs(experiment@assayData$exprs, cIdx=seq_len(nrow(experiment@assayData$exprs)), k=k, 
-                   scIdx=model.data %>% expand.grid %>% apply(1,paste) %>% makeGroups, isLog=log)$normalizedCounts,
-        MNN = mnnCorrect(experiment@assayData$exprs, batch=experiment$batch, k=k)@assays$data$corrected
+        ComBat = ComBat(data, experiment$batch, mod=model.matrix(model, data=model.data)),
+        RUV = RUVs(data, cIdx=seq_len(nrow(data)), k=k,
+                   scIdx=model.data %>% expand.grid %>% apply(1,paste) %>% makeGroups, isLog=TRUE)$normalizedCounts,
+        MNN = mnnCorrect(data, batch=experiment$batch, k=k)@assays$data$corrected
       ),
       phenoData = experiment@phenoData
     ))
