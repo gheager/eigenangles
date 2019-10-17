@@ -76,7 +76,7 @@ access_meta.SummarizedExperiment<-function(experiment){
   return(experiment@metadata)
 }
 access_meta.ExpressionSet<-function(experiment){
-  return(experiment@experimentData)
+  return(experiment@protocolData)
 }
 
 merge_experiments <- function(experiments, log=TRUE, filter.unexpressed.genes=TRUE, force=FALSE){
@@ -103,9 +103,8 @@ merge_experiments <- function(experiments, log=TRUE, filter.unexpressed.genes=TR
       ),
     ExpressionSet=
       ExpressionSet(
-        assayData=if(log) list(log_exprs=data) else list(exprs=data),
-        phenoData=experiments %>% map(phenoData) %>% smartbind(list=.) %>% set_rownames(experiments %>% map(colnames) %>% unlist) %>% cbind(batch),
-        experimentData=list(batch=batch)
+        assayData=data,
+        phenoData=experiments %>% map(~.x@phenoData@data) %>% smartbind(list=.) %>% set_rownames(experiments %>% map(colnames) %>% unlist) %>% cbind(batch) %>% AnnotatedDataFrame
       )
   ))
 }
@@ -159,15 +158,14 @@ correct_batch_effect.ExpressionSet<-function(experiment, model, method=c('ComBat
   model.data<-model.frame(model, experiment@phenoData[all.vars(model)])
   if(length(k)==1|method=='ComBat'){
     return(ExpressionSet(
-      assayData = list(switch(
+      assayData = switch(
         method,
         ComBat = ComBat(experiment@assayData$exprs[[1]], experiment$batch, mod=model.matrix(model, data=model.data)),
         RUV = RUVs(experiment@assayData$exprs[[1]], cIdx=seq_len(nrow(experiment@assayData$exprs[[1]])), k=k, 
                    scIdx=model.data %>% expand.grid %>% apply(1,paste) %>% makeGroups, isLog=log)$normalizedCounts,
         MNN = mnnCorrect(experiment@assayData$exprs[[1]], batch=experiment$batch, k=k)@assayData$exprs$corrected
-      )) %>% set_names(if(log) 'corrected_log_exprs' else 'corrected_exprs'),
-      phenoData = experiment@phenoData,
-      experimentData = experiment@experimentData
+      ),
+      phenoData = experiment@phenoData
     ))
   }else{
     return(k %>% map(correct_batch_effect %>% partial(experiment=experiment, model=model, method=method)))
