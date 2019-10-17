@@ -12,7 +12,8 @@ library(batchelor) #for mnnCorrect
 
 load_experiments<-function(directory, names=dir(directory), item.SimpleList='rnaseq'){
   directory %>% dir %>% 
-    map(~get(load(paste0(directory,'/',.x))) %>% (if(class(.)=='SimpleList') as_mapper(~.[[item.SimpleList]]) else identity)) %>% 
+    map(~get(load(paste0(directory,'/',.x)))) %>% 
+    map(~if(class(.x)=='SimpleList') .x[[item.SimpleList]] else .x) %>% 
     set_names(names)
 }
 
@@ -29,7 +30,8 @@ download_experiments_from_ExpressionAtlas<-function(..., destdir=getwd() %>% pas
 }
 
 remove_isolated_experiments<-function(experiments, biological.group){
-  warning('The batches ',names(experiments)[experiments %>% map(~is.null(.x[[biological.group]])) %>% unlist],' were removed as they do not have a ',biological.group,' column.')
+  warning('The following batches were removed as they do not have a ',biological.group,' column:\n',
+          names(experiments)[experiments %>% map(~is.null(.x[[biological.group]])) %>% unlist])
   experiments[experiments %>% map(~is.null(.x[[biological.group]])) %>% unlist]<-NULL
   batch<-experiments %>% imap(~.y %>% rep(dim(.x)[2])) %>% unlist(use.names=FALSE)
   group<-experiments %>% map(~.[[biological.group]]) %>% unlist(use.names=FALSE)
@@ -43,7 +45,8 @@ remove_isolated_experiments<-function(experiments, biological.group){
   intersections%<>%matrix(length(groups))%<>%set_colnames(names(groups))%<>%set_rownames(names(groups))
   intersections %>% graph_from_adjacency_matrix %>% plot
   experiments[rownames(intersections)[rowSums(intersections!=0)<=1]]<-NULL
-  message('The batches ',rownames(intersections)[rowSums(intersections!=0)<=1],' were removed as they do not share any common point on ',biological.group)
+  message('The following batches were removed as they do not share any common point on ',biological.group,' column:\n',
+          rownames(intersections)[rowSums(intersections!=0)<=1])
   batch<-experiments %>% imap(~.y %>% rep(dim(.x)[2])) %>% unlist(use.names=FALSE)
   group<-experiments %>% map(~.[[biological.group]]) %>% unlist(use.names=FALSE)
   groups <- group %>% split(batch)

@@ -45,16 +45,39 @@ plot.eigenangles.benchmark<-function(tbl,component=1){
 #     facet_wrap(~batch_)
 # }
 
-tanmean<-function(tbl, component=1){
+tanmean<-function(tbl) UseMethod("tanmean")
+
+tanmean.eigenangles<-function(tbl, component=1){
   tbl %>% extract_component(component) %>% 
-    group_by(algorithm,k) %>% 
+    group_by(k) %>% 
     dplyr::summarise(
       integration_angles=atan(mean(tanpi(integration_angles)))/pi,
       conservation_angles=atan(mean(tanpi(conservation_angles)))/pi
     ) %>% structure(class=c('eigenangles.tanmean',class(.)))
 }
 
-plot.eigenangles.tanmean<-function(tbl){
+tanmean.eigenangles.benchmark<-function(tbl, component=1){
+  tbl %>% extract_component(component) %>% 
+    group_by(algorithm,k) %>% 
+    dplyr::summarise(
+      integration_angles=atan(mean(tanpi(integration_angles)))/pi,
+      conservation_angles=atan(mean(tanpi(conservation_angles)))/pi
+    ) %>% structure(class=c('eigenangles.benchmark.tanmean',class(.)))
+}
+
+plot.eigenangles.tanmean<-function(tbl, colour='blue'){
+  ggplot(tbl)+
+    geom_point(aes(x=k, y=integration_angles), colour=colour)+
+    geom_point(aes(x=k, y=-conservation_angles), colour=colour)+
+    geom_hline(aes(yintercept = integration_angles*is.na(k)), colour=colour)+
+    geom_hline(aes(yintercept = -conservation_angles*is.na(k)), colour=colour)+
+    geom_hline(yintercept=0, colour='black')+
+    coord_polar(theta='y',start=pi,direction=-1)+ylim(c(-1,1))+xlim(c(0,max(tbl$k,na.rm=TRUE)))+
+    annotate(label='integration',y=2/3,x=max(tbl$k,na.rm=TRUE)/2,geom='text')+
+    annotate(label='conservation',y=-2/3,x=max(tbl$k,na.rm=TRUE)/2,geom='text')
+}
+
+plot.eigenangles.benchmark.tanmean<-function(tbl){
   ggplot(tbl)+
     geom_point(aes(x=k, y=integration_angles, colour=algorithm))+
     geom_point(aes(x=k, y=-conservation_angles, colour=algorithm))+

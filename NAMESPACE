@@ -1,6 +1,6 @@
 export(
   eigenangles,
-  plot.eigenangles,
+  plot.eigenangles, plot.eigenangles.parametric, plot.eigenangles.benchmark,
   tanmean,
   plot.eigenangles.tanmean,
   gPCA,
