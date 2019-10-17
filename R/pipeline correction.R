@@ -29,9 +29,9 @@ download_experiments_from_ExpressionAtlas<-function(..., destdir=getwd() %>% pas
 }
 
 remove_isolated_experiments<-function(experiments, biological.group){
-  batch<-experiments %>% imap(~.y %>% rep(dim(.x)[2])) %>% unlist(use.names=FALSE)
   warning('The batches ',names(experiments)[experiments %>% map(~is.null(.x[[biological.group]])) %>% unlist],' were removed as they do not have a ',biological.group,' column.')
   experiments[experiments %>% map(~is.null(.x[[biological.group]])) %>% unlist]<-NULL
+  batch<-experiments %>% imap(~.y %>% rep(dim(.x)[2])) %>% unlist(use.names=FALSE)
   group<-experiments %>% map(~.[[biological.group]]) %>% unlist(use.names=FALSE)
   groups <- group %>% split(batch)
   intersections<-NULL
@@ -132,7 +132,7 @@ merge_experiments <- function(experiments, log=TRUE, filter.unexpressed.genes=TR
 #   ))
 # }
 
-correct_batch_effect<-function(experiment, model, method=c('ComBat','RUV','MNN'), k){
+correct_batch_effect<-function(experiment, model, method=c('ComBat','RUV','MNN'), k=NULL){
   UseMethod("correct_batch_effect")
 }
 
@@ -156,17 +156,17 @@ correct_batch_effect.SummarizedExperiment<-function(experiment, model, method=c(
   }
 }
 
-correct_batch_effect.ExpressionSet<-function(experiment, model, method=c('ComBat','RUV','MNN'), k){
-  log<-experiment@assayData$exprs %>% names %>% switch(log_exprs=TRUE, exprs=FALSE)
-  model.data<-model.frame(model, experiment@phenoData[all.vars(model)])
+correct_batch_effect.ExpressionSet<-function(experiment, model, method=c('ComBat','RUV','MNN'), k=NULL){
+  #log<-experiment@assayData$exprs %>% names %>% switch(log_exprs=TRUE, exprs=FALSE)
+  model.data<-model.frame(model, experiment@phenoData@data[all.vars(model)])
   if(length(k)==1|method=='ComBat'){
     return(ExpressionSet(
       assayData = switch(
         method,
-        ComBat = ComBat(experiment@assayData$exprs[[1]], experiment$batch, mod=model.matrix(model, data=model.data)),
-        RUV = RUVs(experiment@assayData$exprs[[1]], cIdx=seq_len(nrow(experiment@assayData$exprs[[1]])), k=k, 
+        ComBat = ComBat(experiment@assayData$exprs, experiment$batch, mod=model.matrix(model, data=model.data)),
+        RUV = RUVs(experiment@assayData$exprs, cIdx=seq_len(nrow(experiment@assayData$exprs[[1]])), k=k, 
                    scIdx=model.data %>% expand.grid %>% apply(1,paste) %>% makeGroups, isLog=log)$normalizedCounts,
-        MNN = mnnCorrect(experiment@assayData$exprs[[1]], batch=experiment$batch, k=k)@assayData$exprs$corrected
+        MNN = mnnCorrect(experiment@assayData$exprs, batch=experiment$batch, k=k)@assayData$exprs$corrected
       ),
       phenoData = experiment@phenoData
     ))
