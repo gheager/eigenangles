@@ -148,7 +148,7 @@ correct_batch_effect<-function(experiment, model, method=c('ComBat','RUV','MNN')
 
 correct_batch_effect.SummarizedExperiment<-function(experiment, model, method, k=NULL){
   log<-experiment@assays$data %>% names %>% switch(log_counts=TRUE, counts=FALSE)
-  data <- experiment@assays$data$counts
+  data <- experiment@assays$data[[1]]
   model.data<-model.frame(model, experiment@colData[all.vars(model)])
   if(length(k)==1|method=='ComBat'){
     return(SummarizedExperiment(
