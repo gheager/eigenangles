@@ -30,6 +30,8 @@ download_experiments_from_ExpressionAtlas<-function(..., destdir=getwd() %>% pas
 
 remove_isolated_experiments<-function(experiments, biological.group){
   batch<-experiments %>% imap(~.y %>% rep(dim(.x)[2])) %>% unlist(use.names=FALSE)
+  warning('The batches ',names(experiments)[experiments %>% map(~is.null(.x[[biological.group]])) %>% unlist],' were removed as they do not have a ',biological.group,' column.')
+  experiments[experiments %>% map(~is.null(.x[[biological.group]])) %>% unlist]<-NULL
   group<-experiments %>% map(~.[[biological.group]]) %>% unlist(use.names=FALSE)
   groups <- group %>% split(batch)
   intersections<-NULL
@@ -41,6 +43,7 @@ remove_isolated_experiments<-function(experiments, biological.group){
   intersections%<>%matrix(length(groups))%<>%set_colnames(names(groups))%<>%set_rownames(names(groups))
   intersections %>% graph_from_adjacency_matrix %>% plot
   experiments[rownames(intersections)[rowSums(intersections!=0)<=1]]<-NULL
+  message('The batches ',rownames(intersections)[rowSums(intersections!=0)<=1],' were removed as they do not share any common point on ',biological.group)
   batch<-experiments %>% imap(~.y %>% rep(dim(.x)[2])) %>% unlist(use.names=FALSE)
   group<-experiments %>% map(~.[[biological.group]]) %>% unlist(use.names=FALSE)
   groups <- group %>% split(batch)
