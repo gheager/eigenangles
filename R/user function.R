@@ -2,33 +2,33 @@ eigenangles_wrapper<-function(experiment, biological.group, reference){
   UseMethod("eigenangles_wrapper")
 }
 
-eigenangles_wrapper.SummarizedExperiment<-function(experiment, biological.group, reference){
+eigenangles_wrapper.SummarizedExperiment<-function(experiment, biological.group, reference, batch="batch"){
   return(eigenangles(
     data=experiment %>% assays %>% extract2(1),
-    batch=experiment$batch,
+    batch=experiment[[batch]],
     biological.group=experiment[[biological.group]],
     reference=reference %>% assays %>% extract2(1)
   ))
 }
 
-eigenangles_wrapper.ExpressionSet<-function(experiment, biological.group, reference){
+eigenangles_wrapper.ExpressionSet<-function(experiment, biological.group, reference, batch="batch"){
   return(eigenangles(
     data=experiment %>% exprs,
-    batch=experiment$batch,
+    batch=experiment[[batch]],
     biological.group=experiment[[biological.group]],
     reference=reference %>% exprs
   ))
 }
 
-eigenangles_wrapper.list<-function(experiment, biological.group, reference){
+eigenangles_wrapper.list<-function(experiment, biological.group, reference, batch="batch"){
   return(experiment %>% 
-           map(eigenangles_wrapper %>% partial(biological.group=biological.group, reference=reference)) %>% 
+           map(eigenangles_wrapper %>% partial(biological.group=biological.group, reference=reference, batch=batch)) %>% 
            imap(~mutate(.x,k=.y)) %>% purrr::reduce(rbind) %>% 
            structure(class=c('eigenangles.parametric',class(.))))
 }
 
-eigenangles_benchmark<-function(..., uncorrected, biological.group){
-  list(...,uncorrected=uncorrected) %>% map(eigenangles_wrapper %>% partial(biological.group=biological.group,reference=uncorrected)) %>% 
+eigenangles_benchmark<-function(..., uncorrected, biological.group, batch="batch"){
+  list(...,uncorrected=uncorrected) %>% map(eigenangles_wrapper %>% partial(biological.group=biological.group,reference=uncorrected, batch=batch)) %>% 
     imap(~mutate(.x,algorithm=.y)) %>% 
     purrr::reduce(rbind.fill) %>% as_tibble %>% structure(class=c('eigenangles.benchmark','eigenangles',class(.)))
 }

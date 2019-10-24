@@ -8,13 +8,14 @@ Eigengenes Angles to benchmark methods of batch effect correction
 Apply \code{eigenangles} to a set of corrected datasets from different correction methods.
 }
 \usage{
-eigenangles_benchmark(..., uncorrected, biological.group)
+eigenangles_benchmark(..., uncorrected, biological.group, batch="batch")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{...}{Multiple arguments corresponding to as many corrected datasets (\code{SummarizedExperiment} objects) as wanted to be compared. These arguments should be named according to the correction method used, in order to identify them easily in the result.}
   \item{uncorrected}{A dataset (\code{SummarizedExperiment}) that is the uncorrected dataset. This has to be declared independantly to be identified as the reference for angles of batch conservation.}
   \item{biological.group}{A character string giving the name of the column of the \code{colData()} field of each experiment to use as biological covariate.}
+  \item{batch}{A character string indicating which columns of the phenoData must be considered as the batch factor. Default is "batch", as done by the \code{merge_experiments} function.}
 }
 \details{
 Arguments in the ellipsis \code{...} can be \code{SummarizedExperiment} datasets or lists of \code{SummarizedExperiment} datasets. A list of \code{SummarizedExperiment} datasets can be used to gather datasets that have been corrected using the same method but with different values of a parameter k (if applicable to this correction method). This k parameter will be displayed in the \code{$k} column of the result, if applicable.

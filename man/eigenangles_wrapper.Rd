@@ -6,13 +6,14 @@
 Apply \code{eigenangles} to a wrapped integrated experiment.
 }
 \usage{
-eigenangles_wrapper(experiment, biological.group, ref)
+eigenangles_wrapper(experiment, biological.group, reference, batch="batch")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{experiment}{A \code{SummarizedExperiment} object corresponding to a corrected integrated dataset.}
   \item{biological.group}{A character string giving the name of the column of \code{colData(experiment)} to use as biological covariate.}
   \item{reference}{A \code{SummarizedExperiment} corresponding to the uncorrected dataset.}
+  \item{batch}{A character string indicating which columns of the phenoData must be considered as the batch factor. Default is "batch", as done by the \code{merge_experiments} function.}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~

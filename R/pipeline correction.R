@@ -18,16 +18,26 @@ load_experiments<-function(directory, names=dir(directory), item.SimpleList='rna
 }
 
 download_experiments_from_ExpressionAtlas<-function(..., destdir=getwd() %>% paste('experiments',sep='/')){
-  if(destdir %>% dir.exists){
-    stop('Attempted to create directory `',desdir,'`` but this address already exists. Rename it or modify `destdir` argument in `download_experiments`.')
-  }else{
-    destdir %>% dir.creates
+  if(!(destdir %>% dir.exists) ){
+    destdir %>% dir.create
   }
   for(experiment in list(...)){
-    paste0('https://www.ebi.ac.uk/gxa/experiments-content/',experiment,'/static/',experiment,'-atlasExperimentSummary.Rdata') %>% download.file(destdir)
+    paste0('https://wwwdev.ebi.ac.uk/gxa/experiments-content/',experiment,'/static/',experiment,'-atlasExperimentSummary.Rdata') %>% download.file(destfile = paste0(destdir,"/",experiment,".Rdata"))
   }
-  desdir %>% load_experiments
+  destdir %>% load_experiments
 }
+
+# download_experiments_from_ExpressionAtlas<-function(..., destdir=getwd() %>% paste('experiments',sep='/')){
+#   if(destdir %>% dir.exists){
+#     stop('Attempted to create directory `',desdir,'`` but this address already exists. Rename it or modify `destdir` argument in `download_experiments`.')
+#   }else{
+#     destdir %>% dir.creates
+#   }
+#   for(experiment in list(...)){
+#     paste0('https://www.ebi.ac.uk/gxa/experiments-content/',experiment,'/static/',experiment,'-atlasExperimentSummary.Rdata') %>% download.file(destdir)
+#   }
+#   desdir %>% load_experiments
+# }
 
 remove_isolated_experiments<-function(experiments, biological.group){
   warning('The following batches were removed as they do not have a ',biological.group,' column:\n',
@@ -142,11 +152,11 @@ merge_experiments <- function(experiments, filter.unexpressed.genes=TRUE, log, f
 #   ))
 # }
 
-correct_batch_effect<-function(experiment, model, method=c('ComBat','RUV','MNN'), k){
+correct_batch_effect<-function(experiment, model, method=c('ComBat','RUV','MNN'), k, batch="batch"){
   UseMethod("correct_batch_effect")
 }
 
-correct_batch_effect.SummarizedExperiment<-function(experiment, model, method, k=NULL){
+correct_batch_effect.SummarizedExperiment<-function(experiment, model, method, k=NULL, batch="batch"){
   log<-experiment@assays$data %>% names %>% switch(log_counts=TRUE, counts=FALSE)
   data <- experiment@assays$data[[1]]
   model.data<-model.frame(model, experiment@colData[all.vars(model)])
@@ -154,20 +164,20 @@ correct_batch_effect.SummarizedExperiment<-function(experiment, model, method, k
     return(SummarizedExperiment(
       assays = list(switch(
         method,
-        ComBat = ComBat(data, experiment$batch, mod=model.matrix(model, data=model.data)),
+        ComBat = ComBat(data, experiment[[batch]], mod=model.matrix(model, data=model.data)),
         RUV = RUVs(data, cIdx=seq_len(nrow(data)), k=k,
                    scIdx=model.data %>% expand.grid %>% apply(1,paste) %>% makeGroups, isLog=TRUE)$normalizedCounts,
-        MNN = mnnCorrect(data, batch=experiment$batch, k=k)@assays$data$corrected
+        MNN = mnnCorrect(data, batch=experiment[[batch]], k=k)@assays$data$corrected
       )) %>% set_names(if(log) 'corrected_log_counts' else 'corrected_counts'),
       colData = experiment@colData,
       metadata = experiment@metadata
     ))
   }else{
-    return(k %>% map(correct_batch_effect.SummarizedExperiment %>% partial(experiment=experiment, model=model, method=method)))
+    return(k %>% map(~correct_batch_effect.SummarizedExperiment(experiment=experiment, model=model, method=method, k=.x, batch=batch)))
   }
 }
 
-correct_batch_effect.ExpressionSet<-function(experiment, model, method, k=NULL){
+correct_batch_effect.ExpressionSet<-function(experiment, model, method, k=NULL, batch="batch"){
   #log<-experiment@assayData$exprs %>% names %>% switch(log_exprs=TRUE, exprs=FALSE)
   data <- experiment@assayData$exprs
   model.data<-model.frame(model, experiment@phenoData@data[all.vars(model)])
@@ -175,15 +185,15 @@ correct_batch_effect.ExpressionSet<-function(experiment, model, method, k=NULL){
     return(ExpressionSet(
       assayData = switch(
         method,
-        ComBat = ComBat(data, experiment$batch, mod=model.matrix(model, data=model.data)),
+        ComBat = ComBat(data, experiment[[batch]], mod=model.matrix(model, data=model.data)),
         RUV = RUVs(data, cIdx=seq_len(nrow(data)), k=k,
                    scIdx=model.data %>% expand.grid %>% apply(1,paste) %>% makeGroups, isLog=TRUE)$normalizedCounts,
-        MNN = mnnCorrect(data, batch=experiment$batch, k=k)@assays$data$corrected
+        MNN = mnnCorrect(data, batch=experiment[[batch]], k=k)@assays$data$corrected
       ),
       phenoData = experiment@phenoData
     ))
   }else{
-    return(k %>% map(~correct_batch_effect.ExpressionSet(experiment=experiment, model=model, method=method, k=.x)))
+    return(k %>% map(~correct_batch_effect.ExpressionSet(experiment=experiment, model=model, method=method, k=.x, batch=batch)))
   }
 }
 

@@ -8,7 +8,7 @@ Batch effect correction between roughly merged batches
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-correct_batch_effect(experiment, model, method=c('ComBat','RUV','MNN'), k)
+correct_batch_effect(experiment, model, method=c('ComBat','RUV','MNN'), k, batch="batch")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -16,6 +16,7 @@ correct_batch_effect(experiment, model, method=c('ComBat','RUV','MNN'), k)
   \item{model}{A formula giving the biological model to take into account during batch effect correction. The possible variables are the columns names of the experiment.}
   \item{method}{A character string among 'ComBat', 'RUV' and 'MNN' indicating which correction method to use to correct batch effect.}
   \item{k}{An integer or a vector of integers that is the hyper-parameter for RUV and MNN. For RUV, this is the number of componants of unwanted variation to remove, while for MNN, it is the number of considered nearest neighbours per sample. If \code{k} is a vector of integers, the chosen method is run for each specified value of \code{k} and the result is the list of the individual results for each value of \code{k}.}
+  \item{batch}{A character string indicating which columns of the phenoData must be considered as the batch factor. Default is "batch", as done by the \code{merge_experiments} function.}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
