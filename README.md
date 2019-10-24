@@ -2,6 +2,17 @@
 The integration of biological data is often impeded by batch effect. Many algorithms already exist to try to correct it in different ways. To compare these algorithms, one needs to be able to evaluate "the amount of batch effect" within a dataset (before or after correction).
 The `eigenangles` package provides new tools to achieve this task.
 
+## Package installation
+You can easily install the package on R using `devtools`:
+```r
+devtools::install_github("gheager/eigenangles")
+```
+
+The package can then be loaded with:
+```r
+library(eigenangles)
+```
+
 ## What are eigengenes angles ?
 If you already had to visualise genetical data using Principal Component Analysis (PCA), you may already have heard of "eigengenes" (also known in a more general context as Principal Components or PCs). They are geometrical directions in the space of genes, that are therefore linear combinations of the genes. Their charasteristic is to be the axes on which the dataset is most dispersed. 
 
