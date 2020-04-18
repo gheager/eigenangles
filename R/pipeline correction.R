@@ -73,7 +73,7 @@ remove_isolated_experiments<-function(experiments, biological.group){
 
 access_data<-function(experiment) UseMethod("access_data")
 access_data.SummarizedExperiment<-function(experiment){
-  return(experiment@assays$data$counts)
+  return(experiment@assays@data$counts)
 }
 access_data.ExpressionSet<-function(experiment){
   return(experiment@assayData$exprs)
@@ -157,8 +157,8 @@ correct_batch_effect<-function(experiment, model, method=c('ComBat','RUV','MNN')
 }
 
 correct_batch_effect.SummarizedExperiment<-function(experiment, model, method, k=NULL, batch="batch"){
-  log<-experiment@assays$data %>% names %>% switch(log_counts=TRUE, counts=FALSE)
-  data <- experiment@assays$data[[1]]
+  log<-experiment@assays@data %>% names %>% switch(log_counts=TRUE, counts=FALSE)
+  data <- experiment@assays@data[[1]]
   model.data<-model.frame(model, experiment@colData[all.vars(model)])
   if(length(k)==1|method=='ComBat'){
     return(SummarizedExperiment(
@@ -167,7 +167,7 @@ correct_batch_effect.SummarizedExperiment<-function(experiment, model, method, k
         ComBat = ComBat(data, experiment[[batch]], mod=model.matrix(model, data=model.data)),
         RUV = RUVs(data, cIdx=seq_len(nrow(data)), k=k,
                    scIdx=model.data %>% expand.grid %>% apply(1,paste) %>% makeGroups, isLog=TRUE)$normalizedCounts,
-        MNN = mnnCorrect(data, batch=experiment[[batch]], k=k)@assays$data$corrected
+        MNN = mnnCorrect(data, batch=experiment[[batch]], k=k)@assays@data$corrected
       )) %>% set_names(if(log) 'corrected_log_counts' else 'corrected_counts'),
       colData = experiment@colData,
       metadata = experiment@metadata
@@ -188,7 +188,7 @@ correct_batch_effect.ExpressionSet<-function(experiment, model, method, k=NULL, 
         ComBat = ComBat(data, experiment[[batch]], mod=model.matrix(model, data=model.data)),
         RUV = RUVs(data, cIdx=seq_len(nrow(data)), k=k,
                    scIdx=model.data %>% expand.grid %>% apply(1,paste) %>% makeGroups, isLog=TRUE)$normalizedCounts,
-        MNN = mnnCorrect(data, batch=experiment[[batch]], k=k)@assays$data$corrected
+        MNN = mnnCorrect(data, batch=experiment[[batch]], k=k)@assays@data$corrected
       ),
       phenoData = experiment@phenoData
     ))
@@ -198,7 +198,7 @@ correct_batch_effect.ExpressionSet<-function(experiment, model, method, k=NULL, 
 }
 
 # correct_batch_effect<-function(experiment, model, method=c('ComBat','RUV','MNN'), k=NULL){
-#   #log<-experiment@assays$data %>% names %>% switch(log_counts=TRUE, counts=FALSE)
+#   #log<-experiment@assays@data %>% names %>% switch(log_counts=TRUE, counts=FALSE)
 #   model.data<-model.frame(model, experiment %>% access_pheno %>% extract(all.vars(model)))
 #   for(kk in k){
 #     
@@ -210,7 +210,7 @@ correct_batch_effect.ExpressionSet<-function(experiment, model, method, k=NULL, 
 #         ComBat = ComBat(experiment %>% access_data, experiment$batch, mod=model.matrix(model, data=model.data)),
 #         RUV = RUVs(experiment %>% access_data, cIdx=seq_len(nrow(experiment %>% access_data)), k=k, 
 #                    scIdx=model.data %>% expand.grid %>% apply(1,paste) %>% makeGroups, isLog=log)$normalizedCounts,
-#         MNN = mnnCorrect(experiment %>% access_data, batch=experiment$batch, k=k)@assays$data$corrected
+#         MNN = mnnCorrect(experiment %>% access_data, batch=experiment$batch, k=k)@assays@data$corrected
 #       ),# %>% set_names(if(log) 'corrected_log_counts' else 'corrected_counts'),
 #       phenoData = experiment %>% access_pheno %>% AnnotatedDataFrame,
 #       protocolData = experiment %>% access_meta %>% AnnotatedDataFrame
